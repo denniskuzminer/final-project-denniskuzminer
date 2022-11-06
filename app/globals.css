@@ -1,0 +1,8 @@
+h1 {
+  background-color: aliceblue;
+}
+nav > ul {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+}

@@ -92,4 +92,8 @@ Wasn't really sure how many points you want us to allocate for ourselves. 8 or 1
 
 ## [Link to Initial Main Project File](app.mjs)
 
+https://dribbble.com/shots/18746228-Stock-Market-Dashboard
+
 ## Annotations / References Used
+
+### Milestone 2 Update

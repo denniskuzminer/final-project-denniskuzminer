@@ -81,6 +81,7 @@ Landing page
 
 - (3 points) Unit testing with JavaScript - Jest
 - (3 points) Configuration management - dotenv
+- (3 points) TypeScript
 - (2 points) Use a CSS framework or UI toolkit - Material UI and Plotly but I'm not sure if I really like the way their components looks
 - (6 points) Use a front-end framework - Either React or Next not sure yet
 - (6 points) JavaScript library or module - Data processing and analytics - Something like [danfo.js](https://www.npmjs.com/package/danfojs) or [data-forge](https://www.npmjs.com/package/data-forge)
@@ -92,8 +93,11 @@ Wasn't really sure how many points you want us to allocate for ourselves. 8 or 1
 
 ## [Link to Initial Main Project File](app.mjs)
 
-https://dribbble.com/shots/18746228-Stock-Market-Dashboard
-
 ## Annotations / References Used
 
 ### Milestone 2 Update
+
+#### Notes
+
+- Look back at https://github.com/mui/material-ui/issues/34910 for Turbopack MUI compatibility
+- Inspo https://dribbble.com/shots/18746228-Stock-Market-Dashboard

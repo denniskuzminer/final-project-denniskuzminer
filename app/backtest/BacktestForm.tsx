@@ -16,14 +16,14 @@ export default function BacktestForm(props: BacktestFormProps) {
         <Form>
           {formFields.map(({ id, label, text }, i) => (
             <Field key={i} name={id}>
-              {({ field }) => (
+              {({ field }: any) => (
                 <div>
                   <FormLabel htmlFor={id}>{text}:</FormLabel>
                   <br />
                   <TextField
                     id={id}
                     label={label}
-                    defaultValue={strategy[id]}
+                    // defaultValue={strategy[id] }
                     variant="outlined"
                     {...field}
                   />

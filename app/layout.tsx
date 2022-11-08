@@ -1,14 +1,32 @@
 "use client";
 
-import "./globals.css";
-import { ThemeProvider, CssBaseline } from "@mui/material";
+import {
+  ThemeProvider,
+  CssBaseline,
+  Tabs,
+  Tab,
+  Typography,
+  Toolbar,
+  AppBar,
+} from "@mui/material";
 import { theme } from "./theme/themes";
+import { SyntheticEvent, useState } from "react";
+import Backtest from "./backtest/page";
+import Landing from "./page";
+
+import "./globals.css";
 
 export default function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const [page, setPage] = useState("Search");
+
+  const handlePageChange = (event: SyntheticEvent, newValue: string) => {
+    setPage(newValue);
+  };
+
   return (
     <html>
       <head>
@@ -26,22 +44,14 @@ export default function RootLayout({
       <ThemeProvider theme={theme}>
         <CssBaseline />
         <body>
-          <main>
+          <main className="root">
             <header>
-              <center>
-                <nav>
-                  <ul>
-                    <li>
-                      <a href="./">Home</a>
-                    </li>
-                    <li>
-                      <a href="./backtest">Backtest</a>
-                    </li>
-                  </ul>
-                </nav>
-              </center>
+              <Tabs centered value={page} onChange={handlePageChange}>
+                <Tab value="Search" label="Search" />
+                <Tab value="Backtest" label="Backtest" />
+              </Tabs>
             </header>
-            {children}
+            {page === "Search" ? <Landing /> : <Backtest />}
             <footer></footer>
           </main>
         </body>

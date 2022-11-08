@@ -16,27 +16,32 @@ export default async function handler(
       const test = await newStrategy.save();
       res.status(200).json(test);
     } else if (req.method === "GET") {
-      const allStrats = [
-        {
-          _id: "testid",
-          name: "This is a test",
-          principal: 1000,
-          condition: "This is the condition string",
-          actionIf: "BUY",
-          actionElse: "SELL",
-          on: "TSLA",
-          per: "1D",
-          startDate: "10/10/2021",
-          endDate: "10/10/2022",
-          options: "",
-          backtests: [{ name: "Backtest 1 id" }, { name: "Backtest 2 id" }],
-          __v: "0",
-        },
-      ]; // await Strategy.find({});
-      // console.log(allStrats);
+      console.log("first");
+      const allStrats = await Strategy.find({});
+
+      // [
+      //   {
+      //     _id: "testid",
+      //     name: "This is a test",
+      //     principal: 1000,
+      //     condition: "This is the condition string",
+      //     actionIf: "BUY",
+      //     actionElse: "SELL",
+      //     on: "TSLA",
+      //     per: "1D",
+      //     startDate: "10/10/2021",
+      //     endDate: "10/10/2022",
+      //     options: "",
+      //     backtests: [{ name: "Backtest 1 id" }, { name: "Backtest 2 id" }],
+      //     __v: "0",
+      //   },
+      // ];
+      console.log(allStrats);
       res.status(200).json(allStrats);
 
       // console.log("\n\n\n\n\n\n\n\n\n\nHIIIIIIIIIIIII");
+    } else if (req.method === "PUT") {
+      // Strategy.findByIdAndUpdate()
     }
   } catch (error) {
     console.log(error);

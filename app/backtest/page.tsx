@@ -53,12 +53,12 @@ export default function Backtest() {
       return e.name === values.name;
     });
     if (exists) {
-      setStrategies((prev) => [...prev, values]);
       axios
         .put("/api/strategy", values)
         .then((data) => console.log(data, "hello"))
         .catch((e) => console.log(e, "oh no"));
     } else {
+      setStrategies((prev) => [...prev, { ...values, backtests: [] }]);
       axios
         .post("/api/strategy", values)
         .then((data) => console.log(data, "hello"))
@@ -66,16 +66,20 @@ export default function Backtest() {
     }
   };
 
-  const handleStartBacktest = (e, { values }) => {
+  const handleStartBacktest = (e: any, { values }: any) => {
     axios
       .post("/api/strategy", JSON.stringify(values))
       .then((data) => console.log(data, "hello"))
       .catch((e) => console.log(e, "oh no"));
   };
 
-  const handleActiveStrategyChange = (e, newStrategy, formik) => {
+  const handleActiveStrategyChange = (
+    e: any,
+    newStrategy: any,
+    formik: any
+  ) => {
     setActiveStrategy(
-      strategies.find((strategy) => strategy.name === newStrategy.name)
+      strategies.find((strategy) => strategy.name === newStrategy.name) as any
     );
     Object.keys(newStrategy).forEach((k) => {
       formik.setFieldValue(`${k}`, newStrategy[k]);
@@ -96,7 +100,7 @@ export default function Backtest() {
 
   return (
     <Box sx={{ paddingRight: rightDrawerWidth, paddingLeft: leftDrawerWidth }}>
-      <Typography variant="h1">Backtest</Typography>
+      {/* <Typography variant="h1">Backtest</Typography> */}
       <Formik
         initialValues={{} as BacktestFormData}
         onSubmit={handleSaveStrategy}
@@ -116,9 +120,26 @@ export default function Backtest() {
               anchor="right"
             >
               {isLoading ? (
-                <Skeleton height={70} animation="wave" variant="rounded" />
+                <div className="drawerInner">
+                  {Array(5)
+                    .fill(0)
+                    .map((_, i) => (
+                      <Skeleton
+                        className="skeleton"
+                        key={i}
+                        height={60}
+                        animation="wave"
+                        variant="rounded"
+                        // sx={{
+                        //   "& .MuiSkeleton-wave::after": {
+                        //     animationDelay: `${i * 50}ms !important`,
+                        //   },
+                        // }}
+                      />
+                    ))}
+                </div>
               ) : (
-                <>
+                <div className="drawerInner">
                   {strategies.map((strategy, i) => (
                     <Accordion
                       onChange={(e, expanded) => {
@@ -126,14 +147,21 @@ export default function Backtest() {
                           handleActiveStrategyChange(e, strategy, props);
                         }
                       }}
+                      className="accordion"
+                      disableGutters
                       square
                       key={i}
+                      sx={{
+                        "&:before": {
+                          display: "none",
+                        },
+                      }}
                     >
                       <AccordionSummary expandIcon={<ExpandMoreIcon />}>
                         <Typography>{strategy.name}</Typography>
                       </AccordionSummary>
                       <AccordionDetails>
-                        {strategy.backtests.map((backtest, i) => (
+                        {strategy.backtests.map((backtest: any, i: Number) => (
                           <div>
                             <Button>{backtest.name}</Button>
                           </div>
@@ -141,7 +169,7 @@ export default function Backtest() {
                       </AccordionDetails>
                     </Accordion>
                   ))}
-                </>
+                </div>
               )}
             </Drawer>
             <Drawer
@@ -156,39 +184,52 @@ export default function Backtest() {
               variant="permanent"
               anchor="left"
             >
-              {indicators.map((indicator, i) => (
-                <Accordion key={i}>
-                  <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                    <Typography>{indicator.name}</Typography>
-                  </AccordionSummary>
-                  <AccordionDetails>
-                    <Typography>{indicator.description}</Typography>
-                    <Typography>{indicator.calculation}</Typography>
-                  </AccordionDetails>
-                </Accordion>
-              ))}
+              <div className="drawerInner">
+                {indicators.map((indicator, i) => (
+                  <Accordion
+                    className="accordion"
+                    disableGutters
+                    square
+                    key={i}
+                    sx={{
+                      "&:before": {
+                        display: "none",
+                      },
+                    }}
+                  >
+                    <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                      <Typography>{indicator.name}</Typography>
+                    </AccordionSummary>
+                    <AccordionDetails>
+                      <Typography>{indicator.description}</Typography>
+                      <Typography>{indicator.calculation}</Typography>
+                    </AccordionDetails>
+                  </Accordion>
+                ))}
+              </div>
             </Drawer>
 
             <Form>
               {formFields.map(({ id, label, text }, i) => (
                 <Field key={i} name={id}>
-                  {({ field }) => (
+                  {({ field }: any) => (
                     <div>
                       <FormLabel htmlFor={id}>{text}:</FormLabel>
                       <br />
                       {{
-                        Date: (
-                          <LocalizationProvider dateAdapter={AdapterDayjs}>
-                            <DateTimePicker
-                              id={id}
-                              label={label}
-                              // value={value}
-                              onChange={handleChange}
-                              renderInput={(params) => (
-                                <TextField {...params} />
-                              )}
-                            />
-                          </LocalizationProvider>
+                        _: (
+                          // <LocalizationProvider dateAdapter={AdapterDayjs}>
+                          //   <DateTimePicker
+                          //     id={id}
+                          //     label={label}
+                          //     // value={value}
+                          //     onChange={handleChange}
+                          //     renderInput={(params) => (
+                          //       <TextField {...params} />
+                          //     )}
+                          //   />
+                          // </LocalizationProvider>
+                          <></>
                         ),
                       }[label] || (
                         <TextField

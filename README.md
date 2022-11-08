@@ -82,7 +82,7 @@ Landing page
 - (3 points) Unit testing with JavaScript - Jest
 - (3 points) Configuration management - dotenv
 - (3 points) TypeScript
-- (2 points) Use a CSS framework or UI toolkit - Material UI and Plotly but I'm not sure if I really like the way their components looks
+- (2 points) Use a CSS framework or UI toolkit - Material UI and Plotly but I'm not sure if I really like the way their components look
 - (6 points) Use a front-end framework - Either React or Next not sure yet
 - (6 points) JavaScript library or module - Data processing and analytics - Something like [danfo.js](https://www.npmjs.com/package/danfojs) or [data-forge](https://www.npmjs.com/package/data-forge)
 - (4 points) JavaScript library or module - Drag and Drop (not sure if I will be using this yet) - [React DnD](https://www.npmjs.com/package/react-dnd)
@@ -96,6 +96,13 @@ Wasn't really sure how many points you want us to allocate for ourselves. 8 or 1
 ## Annotations / References Used
 
 ### Milestone 2 Update
+
+- Lots of components are messed up. No real validation or integrity constraints are enforced yet. This is just to show that there has been progress and that the basic form functionality is there. I will implement put too.
+- For research topics, I am using Next.js, Material UI, dotenv, and TypeScript. Also, I'm using Next's custom server instead of express
+- Important: I am using Next 13 which is in Beta and could break idk what'll happen. What can I say, I like to live on the edge like that. Pray for me.
+- In reference to deployment: https://edstem.org/us/courses/27587/discussion/2120057
+- To get this ^ to work, I temporarily got rid of the eslintrc
+- Project link https://final-project-denniskuzminer-7fumtofya-denniskuzminer.vercel.app/ 
 
 #### Notes
 

@@ -6,3 +6,11 @@ nav > ul {
   padding: 0;
   margin: 0;
 }
+
+a {
+  all: unset;
+}
+
+.root {
+  margin: 1% 4% 1% 4%;
+}

@@ -11,4 +11,5 @@ export interface BacktestFormData {
   startDate: Date;
   endDate: Date;
   options?: string;
+  backtests: any;
 }

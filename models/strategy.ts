@@ -12,7 +12,8 @@ const StrategySchema = new Schema({
   startDate: Date,
   endDate: Date,
   options: String,
+  backtests: [mongoose.Schema.Types.ObjectId],
 });
-
+  
 export default mongoose.models.Strategy ||
   mongoose.model("Strategy", StrategySchema);

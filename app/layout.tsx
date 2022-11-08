@@ -19,7 +19,7 @@ export default function RootLayout({
           crossOrigin="true"
         />
         <link
-          href="https://fonts.googleapis.com/css2?family=Alegreya+Sans+SC:wght@100&family=Josefin+Sans:wght@100&family=League+Script&family=Montserrat+Alternates:wght@200&display=swap"
+          href="https://fonts.googleapis.com/css2?family=Josefin+Sans:wght@500&display=swap"
           rel="stylesheet"
         />
       </head>
@@ -28,16 +28,18 @@ export default function RootLayout({
         <body>
           <main>
             <header>
-              <nav>
-                <ul>
-                  <li>
-                    <a href="./">Home</a>
-                  </li>
-                  <li>
-                    <a href="./backtest">Backtest</a>
-                  </li>
-                </ul>
-              </nav>
+              <center>
+                <nav>
+                  <ul>
+                    <li>
+                      <a href="./">Home</a>
+                    </li>
+                    <li>
+                      <a href="./backtest">Backtest</a>
+                    </li>
+                  </ul>
+                </nav>
+              </center>
             </header>
             {children}
             <footer></footer>

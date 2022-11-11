@@ -15,6 +15,7 @@ import Backtest from "./backtest/page";
 import Landing from "./page";
 
 import "./globals.css";
+import CustomDrawer from "./CustomDrawer";
 
 export default function RootLayout({
   children,

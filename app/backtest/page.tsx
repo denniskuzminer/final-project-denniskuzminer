@@ -31,6 +31,7 @@ import { BacktestFormData } from "./models";
 
 import "./Backtest.Module.css";
 import { LocalizationProvider } from "@mui/x-date-pickers";
+import CustomDrawer from "../CustomDrawer";
 
 export default function Backtest() {
   const [strategies, setStrategies] = useState([] as BacktestFormData[]);
@@ -100,25 +101,13 @@ export default function Backtest() {
 
   return (
     <Box sx={{ paddingRight: rightDrawerWidth, paddingLeft: leftDrawerWidth }}>
-      {/* <Typography variant="h1">Backtest</Typography> */}
       <Formik
         initialValues={{} as BacktestFormData}
         onSubmit={handleSaveStrategy}
       >
         {(props: FormikProps<any>) => (
           <>
-            <Drawer
-              sx={{
-                width: rightDrawerWidth,
-                flexShrink: 0,
-                "& .MuiDrawer-paper": {
-                  width: rightDrawerWidth,
-                  boxSizing: "border-box",
-                },
-              }}
-              variant="permanent"
-              anchor="right"
-            >
+            <CustomDrawer anchor="right">
               {isLoading ? (
                 <div className="drawerInner">
                   {Array(5)
@@ -171,19 +160,8 @@ export default function Backtest() {
                   ))}
                 </div>
               )}
-            </Drawer>
-            <Drawer
-              sx={{
-                width: leftDrawerWidth,
-                flexShrink: 0,
-                "& .MuiDrawer-paper": {
-                  width: leftDrawerWidth,
-                  boxSizing: "border-box",
-                },
-              }}
-              variant="permanent"
-              anchor="left"
-            >
+            </CustomDrawer>
+            <CustomDrawer anchor="left">
               <div className="drawerInner">
                 {indicators.map((indicator, i) => (
                   <Accordion
@@ -207,7 +185,7 @@ export default function Backtest() {
                   </Accordion>
                 ))}
               </div>
-            </Drawer>
+            </CustomDrawer>
 
             <Form>
               {formFields.map(({ id, label, text }, i) => (

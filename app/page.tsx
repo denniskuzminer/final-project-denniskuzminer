@@ -12,10 +12,10 @@ import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import { rightDrawerWidth, leftDrawerWidth } from "./backtest/constants";
 import IndicatorsPicker from "./IndicatorsPicker";
 
-export default function Landing() {
+export default function Landing(props) {
   return (
     <Box sx={{ paddingRight: rightDrawerWidth, paddingLeft: leftDrawerWidth }}>
-      <IndicatorsPicker />
+      <IndicatorsPicker {...props} />
       <h1>Stratus</h1>
       This will eventually be something, to access form for Milestone 2 go to
       the Backtest tab

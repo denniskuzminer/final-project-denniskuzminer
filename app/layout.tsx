@@ -17,12 +17,22 @@ import Landing from "./page";
 import "./globals.css";
 import CustomDrawer from "./CustomDrawer";
 
+interface User {
+  username: String;
+  hash: String;
+  favorites: Array<Object>;
+  strategies: Array<Object>;
+  backtests: Array<Object>;
+}
+
 export default function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
   const [page, setPage] = useState("Search");
+  const [user, setUser] = useState<User>({} as User);
+  const props = { user, setUser };
 
   const handlePageChange = (event: SyntheticEvent, newValue: string) => {
     setPage(newValue);
@@ -52,7 +62,11 @@ export default function RootLayout({
                 <Tab value="Backtest" label="Backtest" />
               </Tabs>
             </header>
-            {page === "Search" ? <Landing /> : <Backtest />}
+            {page === "Search" ? (
+              <Landing {...props} />
+            ) : (
+              <Backtest {...props} />
+            )}
             <footer></footer>
           </main>
         </body>

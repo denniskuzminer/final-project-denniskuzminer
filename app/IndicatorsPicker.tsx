@@ -12,6 +12,8 @@ import {
   Popover,
   ClickAwayListener,
   TextField,
+  Alert,
+  CircularProgress,
 } from "@mui/material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
@@ -23,11 +25,12 @@ import CustomDrawer from "./CustomDrawer";
 import { Box } from "@mui/system";
 import { useState } from "react";
 import { stringAvatar } from "./utils";
+import axios from "axios";
 
-export default function IndicatorsPicker() {
+export default function IndicatorsPicker(props) {
   return (
     <CustomDrawer anchor="left">
-      <Profile />
+      <Profile {...props} />
       <div className="drawerInner">
         {indicators.map((indicator, i) => (
           <Accordion
@@ -63,9 +66,13 @@ const user = {
   backtests: ["mongoose.Schema.Types.ObjectId"],
 };
 
-function Profile() {
-  const [loggedIn, setLoggedIn] = useState(false);
+function Profile(props) {
+  const { user, setUser } = props;
+  const { username, hash, favorites, strategies, backtests } = user;
+  const [formLoading, setFormLoading] = useState(false);
   const [formOpen, setFormOpen] = useState("");
+  const [formData, setFormData] = useState({});
+  const [error, setError] = useState("");
 
   const handleLoginFormOpen = () => {
     setFormOpen("Login");
@@ -80,22 +87,56 @@ function Profile() {
   };
 
   const handleClickAway = () => {
+    setError("");
     setFormOpen("");
   };
 
+  const handleEscapePress = (e: any) => {
+    if (e.key === "Escape") {
+      setFormOpen("");
+    }
+  };
+
   const handleLogout = () => {
-    setLoggedIn(!loggedIn);
+    setUser({});
     handleClickAway();
   };
 
-  const handleStopProp = (e) => {
+  const handleStopProp = (e: any) => {
     e.stopPropagation();
+  };
+
+  const handleLogin = () => {};
+
+  const handleFormChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prevState) => ({
+      ...prevState,
+      [name]: value,
+    }));
+  };
+
+  const handleSignup = () => {
+    setFormLoading(true);
+    axios
+      .post("/api/user", formData)
+      .then(({ data }) => {
+        const { username, hash, favorites, strategies, backtests } = data;
+        setUser({ username, hash, favorites, strategies, backtests });
+        setFormLoading(false);
+        setError("");
+        handleClickAway();
+      })
+      .catch((err) => {
+        setFormLoading(false);
+        setError(err.response.data);
+      });
   };
 
   return (
     <Box>
       <div className="profile-root">
-        {loggedIn ? (
+        {!!username ? (
           <ClickAwayListener onClickAway={handleClickAway}>
             <Card className="profile" onClick={handleLogoutFormOpen}>
               <Stack className="profile-container" direction="row" spacing={2}>
@@ -135,6 +176,7 @@ function Profile() {
             vertical: "top",
             horizontal: "left",
           }}
+          onKeyDown={handleEscapePress}
         >
           {{
             Logout: (
@@ -161,7 +203,7 @@ function Profile() {
                   startIcon={<LockOutlinedIcon />}
                   className="login-form-button"
                   variant="contained"
-                  onClick={handleLogout}
+                  onClick={handleLogin}
                 >
                   Login
                 </Button>
@@ -172,22 +214,51 @@ function Profile() {
                 <Typography className="login-heading" variant="h5">
                   Sign up
                 </Typography>
-                <TextField className="login-text" label="Username" />
+                <TextField
+                  name="username"
+                  className="login-text"
+                  label="Username"
+                  onChange={handleFormChange}
+                />
                 <br />
                 <TextField
                   className="login-text"
                   label="Password"
                   type="password"
+                  name="password"
+                  onChange={handleFormChange}
+                />
+                <br />
+                <TextField
+                  className="login-text"
+                  label="Confirm Password"
+                  name="confirmPassword"
+                  type="password"
+                  onChange={handleFormChange}
                 />
                 <br />
                 <Button
-                  startIcon={<LockOutlinedIcon />}
+                  startIcon={
+                    formLoading ? (
+                      <CircularProgress color="secondary" />
+                    ) : (
+                      <LockOutlinedIcon />
+                    )
+                  }
                   className="login-form-button"
                   variant="contained"
-                  onClick={handleLogout}
+                  onClick={handleSignup}
                 >
                   Sign up
                 </Button>
+                {!!error ? (
+                  <>
+                    <br />
+                    <Alert severity="error">{error}</Alert>
+                  </>
+                ) : (
+                  <></>
+                )}
               </Card>
             ),
           }[formOpen] || <></>}

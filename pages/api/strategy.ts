@@ -1,4 +1,4 @@
-import dbConnect from "../../utils/dbConnect";
+import dbConnect from "./utils/dbConnect";
 import Strategy from "../../models/strategy";
 import { NextApiRequest, NextApiResponse } from "next";
 
@@ -16,30 +16,8 @@ export default async function handler(
       const test = await newStrategy.save();
       res.status(200).json(test);
     } else if (req.method === "GET") {
-      console.log("first");
       const allStrats = await Strategy.find({});
-
-      // [
-      //   {
-      //     _id: "testid",
-      //     name: "This is a test",
-      //     principal: 1000,
-      //     condition: "This is the condition string",
-      //     actionIf: "BUY",
-      //     actionElse: "SELL",
-      //     on: "TSLA",
-      //     per: "1D",
-      //     startDate: "10/10/2021",
-      //     endDate: "10/10/2022",
-      //     options: "",
-      //     backtests: [{ name: "Backtest 1 id" }, { name: "Backtest 2 id" }],
-      //     __v: "0",
-      //   },
-      // ];
-      console.log(allStrats);
       res.status(200).json(allStrats);
-
-      // console.log("\n\n\n\n\n\n\n\n\n\nHIIIIIIIIIIIII");
     } else if (req.method === "PUT") {
       // Strategy.findByIdAndUpdate()
     }
@@ -48,3 +26,16 @@ export default async function handler(
     res.json({ error });
   }
 }
+
+// {
+//   "name": "String",
+//   "principal": 10,
+//   "condition": "string",
+//   "actionIf": "Action",
+//   "actionElse": "Action",
+//   "on": "string",
+//   "per": "string",
+//   "startDate": "10/10/2001",
+//   "endDate": "10/10/2001",
+//   "options": "string"
+// }

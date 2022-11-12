@@ -92,11 +92,13 @@ export default function Backtest() {
     axios
       .get("/api/strategy")
       .then(({ data }) => {
-        // console.log(data);
+        console.log(data);
         setStrategies(data);
         setIsLoading(false);
       })
-      .catch((e) => console.log(e, "oh no"));
+      .catch((e) => {
+        console.log(e, "oh no");
+      });
   }, []);
 
   return (

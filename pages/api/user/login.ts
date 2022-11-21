@@ -1,40 +1,34 @@
 import { NextApiRequest, NextApiResponse } from "next";
-import dbConnect from "./utils/dbConnect";
+import dbConnect from "../utils/dbConnect";
 import bcrypt from "bcryptjs";
-import * as auth from "./utils/auth";
-import User from "../../models/user";
+// import * as auth from "./utils/auth";
+import User from "../../../models/user";
 
+// let bcrypt = require("bcrypt");
+// let bcrypt = { compare: (...args: any) => {} };
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
   await dbConnect();
-  console.log(new Date(), req.method);
+  console.log(new Date(), req.method, req.url);
   const { method } = req;
   if (method == "POST") {
-    const { username, password, confirmPassword } =
+    const { username, password } =
       typeof req.body === "string" ? JSON.parse(req.body) : req.body;
-    if (password !== confirmPassword) {
-      res.status(409).send("Passwords do not match");
+
+    const user = await User.findOne({ username });
+    if (!user) {
+      res.status(409).send("Username does not exist");
       return;
     }
-    const check = await User.findOne({ username });
-    if (check) {
-      res.status(409).send("User already exists");
-      return;
-    }
-    const hash = await bcrypt.hash(password, 10);
-    const user = new User({
-      username,
-      hash,
-      favorites: [],
-      strategies: [],
-      backtests: [],
+    bcrypt.compare(password, user.hash, (err: any, passwordMatch: any) => {
+      if (passwordMatch) {
+        res.status(200).json(user);
+      } else {
+        res.status(409).send("Incorrect password");
+      }
     });
-    await user
-      .save()
-      .then((data) => res.status(200).json(data))
-      .catch((err) => res.status(err.status).send("Error saving user"));
 
     // auth.register(
     //   req.body.username,

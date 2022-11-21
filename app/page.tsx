@@ -12,7 +12,7 @@ import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import { rightDrawerWidth, leftDrawerWidth } from "./backtest/constants";
 import IndicatorsPicker from "./IndicatorsPicker";
 
-export default function Landing(props) {
+export default function Landing(props: any) {
   return (
     <Box sx={{ paddingRight: rightDrawerWidth, paddingLeft: leftDrawerWidth }}>
       <IndicatorsPicker {...props} />

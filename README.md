@@ -102,7 +102,13 @@ Wasn't really sure how many points you want us to allocate for ourselves. 8 or 1
 - Important: I am using Next 13 which is in Beta and could break idk what'll happen. What can I say, I like to live on the edge like that. Pray for me.
 - In reference to deployment: https://edstem.org/us/courses/27587/discussion/2120057
 - To get this ^ to work, I temporarily got rid of the eslintrc
-- Project link https://final-project-denniskuzminer-7fumtofya-denniskuzminer.vercel.app/ 
+- Project link https://final-project-denniskuzminer-7fumtofya-denniskuzminer.vercel.app/
+
+### Milestone 3 Update
+
+- Added a component for signing in and signing up. This works, but does not keep your session.
+- Added a lot more Typescript types for new components
+- I have had lots of deployment issues. I tried deploying on netlify instead of vercel. Here is the link: https://deluxe-jelly-5699ff.netlify.app/
 
 #### Notes
 

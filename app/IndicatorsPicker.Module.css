@@ -28,12 +28,12 @@
   margin-top: 3%;
 }
 .logout-popover {
-  border: 2px solid rgba(128, 128, 128, 0.444);
+  border: 2px solid rgba(128, 128, 128, 0.157);
   padding: 1rem 5rem 1rem 5rem;
 }
 
 .login-popover {
-  border: 2px solid rgba(128, 128, 128, 0.444);
+  border: 2px solid rgba(128, 128, 128, 0.182);
   padding: 1rem 2.5rem 1rem 2.5rem;
 }
 .login-text {

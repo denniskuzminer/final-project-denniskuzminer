@@ -13,9 +13,10 @@ import { theme } from "./theme/themes";
 import { SyntheticEvent, useState } from "react";
 import Backtest from "./backtest/page";
 import Landing from "./page";
-
+import { Josefin_Sans } from "@next/font/google";
 import "./globals.css";
 import CustomDrawer from "./CustomDrawer";
+import Head from "next/head";
 
 interface User {
   username: String;
@@ -24,6 +25,7 @@ interface User {
   strategies: Array<Object>;
   backtests: Array<Object>;
 }
+const josefin_sans = Josefin_Sans({ subsets: ["latin"], weight: ["500"] });
 
 export default function RootLayout({
   children,
@@ -40,18 +42,30 @@ export default function RootLayout({
 
   return (
     <html>
-      <head>
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
+      <Head>
+        {/* <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link
           rel="preconnect"
           href="https://fonts.gstatic.com"
           crossOrigin="true"
         />
+
         <link
           href="https://fonts.googleapis.com/css2?family=Josefin+Sans:wght@500&display=swap"
           rel="stylesheet"
         />
-      </head>
+        <style jsx global>{`
+          html {
+            font-family: ${josefin_sans.style.fontFamily};
+          }
+        `}</style> */}
+        <style>
+          @import
+          url('https://fo nts.googleapis.com/css2?family=Josefin+Sans:wght@500&display=swap');
+        </style>
+        <meta name="emotion-insertion-point" content="" />
+      </Head>
+
       <ThemeProvider theme={theme}>
         <CssBaseline />
         <body>
@@ -62,11 +76,7 @@ export default function RootLayout({
                 <Tab value="Backtest" label="Backtest" />
               </Tabs>
             </header>
-            {page === "Search" ? (
-              <Landing {...props} />
-            ) : (
-              <Backtest {...props} />
-            )}
+            {page === "Search" ? <Landing {...props} /> : <Backtest />}
             <footer></footer>
           </main>
         </body>

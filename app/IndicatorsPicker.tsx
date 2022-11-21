@@ -27,7 +27,35 @@ import { useState } from "react";
 import { stringAvatar } from "./utils";
 import axios from "axios";
 
-export default function IndicatorsPicker(props) {
+interface ProfileProps {
+  user: User;
+  setUser: React.Dispatch<React.SetStateAction<User>>;
+}
+
+interface User {
+  username: string;
+  hash: string;
+  favorites: Array<Object>;
+  strategies: Array<Object>;
+  backtests: Array<Object>;
+}
+
+interface LoginFormData {
+  username: string;
+  password: string;
+}
+
+interface SignUpFormData {
+  username: string;
+  password: string;
+  confirmPassword: string;
+}
+
+type LoginFormDataLike = LoginFormData | SignUpFormData;
+
+type IndicatorsPickerProps = ProfileProps;
+
+export default function IndicatorsPicker(props: IndicatorsPickerProps) {
   return (
     <CustomDrawer anchor="left">
       <Profile {...props} />
@@ -66,12 +94,12 @@ const user = {
   backtests: ["mongoose.Schema.Types.ObjectId"],
 };
 
-function Profile(props) {
+function Profile(props: ProfileProps) {
   const { user, setUser } = props;
   const { username, hash, favorites, strategies, backtests } = user;
   const [formLoading, setFormLoading] = useState(false);
   const [formOpen, setFormOpen] = useState("");
-  const [formData, setFormData] = useState({});
+  const [formData, setFormData] = useState<LoginFormDataLike>({} as LoginFormDataLike);
   const [error, setError] = useState("");
 
   const handleLoginFormOpen = () => {
@@ -91,26 +119,44 @@ function Profile(props) {
     setFormOpen("");
   };
 
-  const handleEscapePress = (e: any) => {
+  const handleEscapePress = (e: React.KeyboardEvent) => {
     if (e.key === "Escape") {
       setFormOpen("");
     }
   };
 
   const handleLogout = () => {
-    setUser({});
+    setUser({} as User);
     handleClickAway();
   };
 
-  const handleStopProp = (e: any) => {
+  const handleStopProp = (e: React.MouseEvent<HTMLElement>) => {
     e.stopPropagation();
   };
 
-  const handleLogin = () => {};
+  const handleLogin = () => {
+    setFormLoading(true);
+    axios
+      .post("/api/user/login", {
+        username: formData.username,
+        password: formData.password,
+      })
+      .then(({ data }) => {
+        const { username, hash, favorites, strategies, backtests } = data;
+        setUser({ username, hash, favorites, strategies, backtests });
+        setFormLoading(false);
+        setError("");
+        handleClickAway();
+      })
+      .catch((err) => {
+        setFormLoading(false);
+        setError(err.response.data);
+      });
+  };
 
-  const handleFormChange = (e) => {
+  const handleFormChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setFormData((prevState) => ({
+    setFormData((prevState: LoginFormDataLike) => ({
       ...prevState,
       [name]: value,
     }));
@@ -119,7 +165,7 @@ function Profile(props) {
   const handleSignup = () => {
     setFormLoading(true);
     axios
-      .post("/api/user", formData)
+      .post("/api/user/signup", formData)
       .then(({ data }) => {
         const { username, hash, favorites, strategies, backtests } = data;
         setUser({ username, hash, favorites, strategies, backtests });
@@ -191,22 +237,43 @@ function Profile(props) {
                 <Typography className="login-heading" variant="h5">
                   Login
                 </Typography>
-                <TextField className="login-text" label="Username" />
+                <TextField
+                  className="login-text"
+                  name="username"
+                  label="Username"
+                  onChange={handleFormChange}
+                />
                 <br />
                 <TextField
                   className="login-text"
                   label="Password"
+                  name="password"
                   type="password"
+                  onChange={handleFormChange}
                 />
                 <br />
                 <Button
-                  startIcon={<LockOutlinedIcon />}
+                  startIcon={
+                    formLoading ? (
+                      <CircularProgress color="secondary" />
+                    ) : (
+                      <LockOutlinedIcon />
+                    )
+                  }
                   className="login-form-button"
                   variant="contained"
                   onClick={handleLogin}
                 >
                   Login
                 </Button>
+                {!!error ? (
+                  <>
+                    <br />
+                    <Alert severity="error">{error}</Alert>
+                  </>
+                ) : (
+                  <></>
+                )}
               </Card>
             ),
             "Sign up": (

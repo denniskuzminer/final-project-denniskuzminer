@@ -16,24 +16,25 @@
     "@mui/lab": "^5.0.0-alpha.107",
     "@mui/material": "^5.10.12",
     "@mui/x-date-pickers": "^5.0.7",
+    "@next/font": "^13.0.4",
     "@types/node": "18.11.9",
     "@types/react": "18.0.25",
     "@types/react-dom": "18.0.8",
     "axios": "^1.1.3",
+    "bcryptjs": "^2.4.3",
     "dayjs": "^1.11.6",
     "eslint": "8.27.0",
-    "eslint-config-next": "13.0.2",
+    "eslint-config-next": "^13.0.4",
     "formik": "^2.2.9",
     "moment": "^2.29.4",
     "mongoose": "^6.7.1",
-    "next": "13.0.2",
-    "react": "^16.4.0",
-    "react-dom": "18.2.0",
+    "next": "^13.0.4",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
     "typescript": "4.8.4"
   },
   "devDependencies": {
     "@netlify/plugin-nextjs": "^4.28.4-appdir.0",
-    "@types/bcryptjs": "^2.4.2",
-    "bcryptjs": "^2.4.3"
+    "@types/bcryptjs": "^2.4.2"
   }
 }

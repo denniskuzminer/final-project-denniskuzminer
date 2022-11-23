@@ -42,8 +42,8 @@ export default function RootLayout({
 
   return (
     <html>
-      <Head>
-        {/* <link rel="preconnect" href="https://fonts.googleapis.com" />
+      <head>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link
           rel="preconnect"
           href="https://fonts.gstatic.com"
@@ -54,17 +54,17 @@ export default function RootLayout({
           href="https://fonts.googleapis.com/css2?family=Josefin+Sans:wght@500&display=swap"
           rel="stylesheet"
         />
-        <style jsx global>{`
+        {/* <style jsx global>{`
           html {
             font-family: ${josefin_sans.style.fontFamily};
           }
         `}</style> */}
-        <style>
+        {/* <style>
           @import
           url('https://fo nts.googleapis.com/css2?family=Josefin+Sans:wght@500&display=swap');
-        </style>
+        </style> */}
         <meta name="emotion-insertion-point" content="" />
-      </Head>
+      </head>
 
       <ThemeProvider theme={theme}>
         <CssBaseline />

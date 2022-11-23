@@ -24,7 +24,7 @@ import "./IndicatorsPicker.Module.css";
 import CustomDrawer from "./CustomDrawer";
 import { Box } from "@mui/system";
 import { useState } from "react";
-import { stringAvatar } from "./utils";
+import { stringAvatar } from "./utils/profileUtils";
 import axios from "axios";
 
 interface ProfileProps {

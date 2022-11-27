@@ -14,11 +14,12 @@ import {
   TextField,
   Alert,
   CircularProgress,
+  IconButton,
 } from "@mui/material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import { indicators } from "./backtest/constants";
-
+import CloseIcon from "@mui/icons-material/Close";
 import "./globals.css";
 import "./IndicatorsPicker.Module.css";
 import CustomDrawer from "./CustomDrawer";
@@ -99,7 +100,9 @@ function Profile(props: ProfileProps) {
   const { username, hash, favorites, strategies, backtests } = user;
   const [formLoading, setFormLoading] = useState(false);
   const [formOpen, setFormOpen] = useState("");
-  const [formData, setFormData] = useState<LoginFormDataLike>({} as LoginFormDataLike);
+  const [formData, setFormData] = useState<LoginFormDataLike>(
+    {} as LoginFormDataLike
+  );
   const [error, setError] = useState("");
 
   const handleLoginFormOpen = () => {
@@ -114,7 +117,7 @@ function Profile(props: ProfileProps) {
     setFormOpen("Logout");
   };
 
-  const handleClickAway = () => {
+  const handleClose = () => {
     setError("");
     setFormOpen("");
   };
@@ -127,7 +130,7 @@ function Profile(props: ProfileProps) {
 
   const handleLogout = () => {
     setUser({} as User);
-    handleClickAway();
+    handleClose();
   };
 
   const handleStopProp = (e: React.MouseEvent<HTMLElement>) => {
@@ -146,7 +149,7 @@ function Profile(props: ProfileProps) {
         setUser({ username, hash, favorites, strategies, backtests });
         setFormLoading(false);
         setError("");
-        handleClickAway();
+        handleClose();
       })
       .catch((err) => {
         setFormLoading(false);
@@ -171,7 +174,7 @@ function Profile(props: ProfileProps) {
         setUser({ username, hash, favorites, strategies, backtests });
         setFormLoading(false);
         setError("");
-        handleClickAway();
+        handleClose();
       })
       .catch((err) => {
         setFormLoading(false);
@@ -183,37 +186,33 @@ function Profile(props: ProfileProps) {
     <Box>
       <div className="profile-root">
         {!!username ? (
-          <ClickAwayListener onClickAway={handleClickAway}>
-            <Card className="profile" onClick={handleLogoutFormOpen}>
-              <Stack className="profile-container" direction="row" spacing={2}>
-                <Avatar
-                  className="profile-avatar"
-                  variant="rounded"
-                  {...stringAvatar(user.username)}
-                />
-                <div className="username-container">
-                  <Typography variant="h6" className="username">
-                    {user.username}
-                  </Typography>
-                </div>
-              </Stack>
-            </Card>
-          </ClickAwayListener>
-        ) : (
-          <ClickAwayListener onClickAway={handleClickAway}>
-            <Stack className="login-buttons" direction="row" spacing={2}>
-              <Button
-                onClick={handleLoginFormOpen}
-                className="login-button"
-                variant="contained"
-              >
-                LOGIN
-              </Button>
-              <Button onClick={handleSignUpFormOpen} variant="contained">
-                SIGN UP
-              </Button>
+          <Card className="profile" onClick={handleLogoutFormOpen}>
+            <Stack className="profile-container" direction="row" spacing={2}>
+              <Avatar
+                className="profile-avatar"
+                variant="rounded"
+                {...stringAvatar(user.username)}
+              />
+              <div className="username-container">
+                <Typography variant="h6" className="username">
+                  {user.username}
+                </Typography>
+              </div>
             </Stack>
-          </ClickAwayListener>
+          </Card>
+        ) : (
+          <Stack className="login-buttons" direction="row" spacing={2}>
+            <Button
+              onClick={handleLoginFormOpen}
+              className="login-button"
+              variant="contained"
+            >
+              LOGIN
+            </Button>
+            <Button onClick={handleSignUpFormOpen} variant="contained">
+              SIGN UP
+            </Button>
+          </Stack>
         )}
         <Popover
           className="popover"
@@ -227,6 +226,12 @@ function Profile(props: ProfileProps) {
           {{
             Logout: (
               <Card onClick={handleStopProp} className="logout-popover">
+                <IconButton
+                  sx={{ position: "absolute", top: "1%", right: "1%" }}
+                  onClick={handleClose}
+                >
+                  <CloseIcon />
+                </IconButton>
                 <Button variant="contained" onClick={handleLogout}>
                   Logout
                 </Button>
@@ -234,6 +239,12 @@ function Profile(props: ProfileProps) {
             ),
             Login: (
               <Card onClick={handleStopProp} className="login-popover">
+                <IconButton
+                  sx={{ position: "absolute", top: "1%", right: "1%" }}
+                  onClick={handleClose}
+                >
+                  <CloseIcon />
+                </IconButton>
                 <Typography className="login-heading" variant="h5">
                   Login
                 </Typography>
@@ -278,6 +289,12 @@ function Profile(props: ProfileProps) {
             ),
             "Sign up": (
               <Card onClick={handleStopProp} className="login-popover">
+                <IconButton
+                  onClick={handleClose}
+                  sx={{ position: "absolute", top: "1%", right: "1%" }}
+                >
+                  <CloseIcon />
+                </IconButton>
                 <Typography className="login-heading" variant="h5">
                   Sign up
                 </Typography>

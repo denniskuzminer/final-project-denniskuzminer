@@ -31,3 +31,14 @@ export const searchSymbol = async (keywords: string) => {
     ) || []
   );
 };
+
+export const getCompanyInfo = async (symbol: string) => {
+  if (symbol === "") {
+    return [];
+  }
+  const { data } = await axios.get(
+    `https://www.alphavantage.co/query?function=OVERVIEW&symbol=${symbol}&apikey=${process
+      .env.ALPHA_VANTAGE_API_KEY!}`
+  );
+  return data;
+};

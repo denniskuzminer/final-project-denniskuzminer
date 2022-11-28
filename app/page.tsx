@@ -15,6 +15,9 @@ import {
   Button,
   Tabs,
   Tab,
+  Card,
+  CardMedia,
+  CardContent,
 } from "@mui/material";
 import Divider from "@mui/material/Divider";
 import { ResponsiveLine } from "@nivo/line";
@@ -25,16 +28,31 @@ import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
 import FavoriteIcon from "@mui/icons-material/Favorite";
 import { data, SEARCH_TIMEOUT } from "./constants";
 import {
+  API_LIMIT_ERROR_MESSAGE,
   getCompanyInfo,
   getPrices,
+  hitAPILimit,
   searchSymbol,
 } from "./utils/marketApiUtils";
 import SearchIcon from "@mui/icons-material/Search";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { debounce } from "lodash";
+import { convertAPIStringToDateString } from "./utils/dateUtils";
 
 const toolTipElement = (props: any) => {
   return <div>{props.point.data.y} °C</div>;
+};
+
+const ErrorMessage = () => {
+  const message = API_LIMIT_ERROR_MESSAGE.split(". ");
+  const [heading, ...rest] = message;
+
+  return (
+    <Box>
+      <Typography variant="h5">{heading}</Typography>
+      <Typography>{rest.join(". ")}</Typography>
+    </Box>
+  );
 };
 
 export default function Landing(props: any) {
@@ -64,7 +82,10 @@ export default function Landing(props: any) {
   ).current;
 
   useEffect(() => {
-    getCompanyInfo(symbol).then((data) => setCompanyInfo(data));
+    getCompanyInfo(symbol).then((data) => {
+      console.log(data);
+      setCompanyInfo(data);
+    });
   }, [symbol]);
 
   useEffect(() => {
@@ -78,7 +99,106 @@ export default function Landing(props: any) {
       <IndicatorsPicker {...props} />
       {/* {getPrices("IBM", "5min")} */}
       <CustomDrawer anchor="right">
-        <div></div>
+        {symbol ? (
+          <Box
+            sx={{
+              height: "100%",
+              padding: "10%",
+              // border: "4px solid yellow",
+            }}
+          >
+            <Typography fontWeight="700" variant="h6">
+              About:
+            </Typography>
+            <Box
+              sx={{
+                height: "47%",
+                overflow: "auto",
+                // border: "4px solid yellow",
+              }}
+              className="custom-scroll"
+            >
+              {hitAPILimit(companyInfo) ? (
+                <ErrorMessage />
+              ) : (
+                <Typography>{companyInfo["Description"]}</Typography>
+              )}
+            </Box>
+            <br />
+            <Typography fontWeight="700" variant="h6">
+              News:
+            </Typography>
+            <Box
+              className="custom-scroll"
+              sx={{
+                height: "47%",
+                overflow: "auto",
+                // border: "4px solid yellow",
+              }}
+            >
+              {hitAPILimit(companyInfo) ? (
+                <ErrorMessage />
+              ) : (
+                <Box>
+                  {companyInfo["News"]?.feed?.map(
+                    (
+                      {
+                        title,
+                        url,
+                        banner_image,
+                        time_published,
+                        source_domain,
+                      },
+                      i
+                    ) => (
+                      <Card
+                        sx={{
+                          cursor: "pointer",
+                          marginBottom: "5%",
+                        }}
+                        onClick={() => window.open(url, "_blank")}
+                        key={i}
+                        className="card-hover"
+                      >
+                        <CardMedia
+                          sx={{ maxHeight: "10%" }}
+                          component="img"
+                          image={banner_image}
+                        />
+                        <CardContent>
+                          <Typography>{title}</Typography>
+                          <Typography fontSize="10px">
+                            {convertAPIStringToDateString(time_published)}
+                          </Typography>
+                          <Typography fontSize="12px">
+                            {source_domain}
+                          </Typography>
+                        </CardContent>
+                      </Card>
+                    )
+                  )}
+                </Box>
+              )}
+            </Box>
+          </Box>
+        ) : (
+          <Box
+            sx={{
+              height: "100%",
+              display: "flex",
+              margin: "3%",
+            }}
+          >
+            <Typography
+              sx={{
+                textAlign: "center",
+                margin: "auto",
+              }}
+            >
+              Type in a stock ticker to get information and recent news
+            </Typography>
+          </Box>
+        )}
       </CustomDrawer>
       <Box
         sx={{

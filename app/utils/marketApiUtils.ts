@@ -33,12 +33,32 @@ export const searchSymbol = async (keywords: string) => {
 };
 
 export const getCompanyInfo = async (symbol: string) => {
-  if (symbol === "") {
-    return [];
+  if (!symbol) {
+    return {};
   }
-  const { data } = await axios.get(
-    `https://www.alphavantage.co/query?function=OVERVIEW&symbol=${symbol}&apikey=${process
-      .env.ALPHA_VANTAGE_API_KEY!}`
-  );
-  return data;
+  return await Promise.all(
+    ["OVERVIEW", "NEWS_SENTIMENT"].map((func) =>
+      axios.get(
+        `https://www.alphavantage.co/query?function=${func}&${
+          func === "OVERVIEW" ? "symbol" : "tickers"
+        }=${symbol}&apikey=${process.env.ALPHA_VANTAGE_API_KEY!}`
+      )
+    )
+  )
+    .then((values) => {
+      const [{ data: info }, { data: news }] = values;
+      info["News"] = news;
+      return info;
+    })
+    .catch((error) => ({}));
 };
+
+export const API_LIMIT_ERROR_MESSAGE =
+  "Woah, woah, woah. Listen, I appreciate that you find my project cool and want to try things out, " +
+  "but I'm just a measly student. We're not all made of money. APIs are expensive kinda... I'm working " +
+  'with the free tier here. I know what you\'re thinking, \n\t "Cool story developer man, so what?"\n' +
+  "Well, I only get 5 API calls per minute, so wait one minute and check right back here again. :)";
+
+export const hitAPILimit = (data) =>
+  data.Note ===
+  "Thank you for using Alpha Vantage! Our standard API call frequency is 5 calls per minute and 500 calls per day. Please visit https://www.alphavantage.co/premium/ if you would like to target a higher API call frequency.";

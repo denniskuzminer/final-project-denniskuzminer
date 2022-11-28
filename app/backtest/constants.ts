@@ -25,4 +25,64 @@ export const indicators = [
     description: "Plots the average of the previous X periods",
     calculation: "",
   },
+  {
+    name: "Simple Moving Average",
+    description: "Plots the average of the previous X periods",
+    calculation: "",
+  },
+  {
+    name: "Exponential Moving Average",
+    description: "Plots the average of the previous X periods",
+    calculation: "",
+  },
+  {
+    name: "Simple Moving Average",
+    description: "Plots the average of the previous X periods",
+    calculation: "",
+  },
+  {
+    name: "Exponential Moving Average",
+    description: "Plots the average of the previous X periods",
+    calculation: "",
+  },
+  {
+    name: "Simple Moving Average",
+    description: "Plots the average of the previous X periods",
+    calculation: "",
+  },
+  {
+    name: "Exponential Moving Average",
+    description: "Plots the average of the previous X periods",
+    calculation: "",
+  },
+  {
+    name: "Simple Moving Average",
+    description: "Plots the average of the previous X periods",
+    calculation: "",
+  },
+  {
+    name: "Exponential Moving Average",
+    description: "Plots the average of the previous X periods",
+    calculation: "",
+  },
+  {
+    name: "Simple Moving Average",
+    description: "Plots the average of the previous X periods",
+    calculation: "",
+  },
+  {
+    name: "Exponential Moving Average",
+    description: "Plots the average of the previous X periods",
+    calculation: "",
+  },
+  {
+    name: "Simple Moving Average",
+    description: "Plots the average of the previous X periods",
+    calculation: "",
+  },
+  {
+    name: "Last Exponential Moving Average",
+    description: "Plots the average of the previous X periods",
+    calculation: "",
+  },
 ];

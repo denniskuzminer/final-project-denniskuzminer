@@ -9,6 +9,7 @@ import {
   Button,
   Stack,
   Card,
+  CardContent,
   Popover,
   ClickAwayListener,
   TextField,
@@ -24,19 +25,24 @@ import "./globals.css";
 import "./IndicatorsPicker.Module.css";
 import CustomDrawer from "./CustomDrawer";
 import { Box } from "@mui/system";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { stringAvatar } from "./utils/profileUtils";
 import axios from "axios";
+import {
+  formatDollarAmount,
+  getDataFromFavorites,
+} from "./utils/marketApiUtils";
 
 interface ProfileProps {
   user: User;
   setUser: React.Dispatch<React.SetStateAction<User>>;
+  setSymbol: React.Dispatch<React.SetStateAction<User>>;
 }
 
 interface User {
   username: string;
   hash: string;
-  favorites: Array<Object>;
+  favorites: Array<string>;
   strategies: Array<Object>;
   backtests: Array<Object>;
 }
@@ -57,32 +63,146 @@ type LoginFormDataLike = LoginFormData | SignUpFormData;
 type IndicatorsPickerProps = ProfileProps;
 
 export default function IndicatorsPicker(props: IndicatorsPickerProps) {
+  const { user, setSymbol } = props;
+  const { favorites } = user;
+  const [favoritesData, setFavoritesData] = useState([]);
+
+  const handleFavoriteClick = (e, symbol) => {
+    setSymbol(symbol);
+    // console.log(e);
+  };
+
+  useEffect(() => {
+    getDataFromFavorites(favorites).then((values: Array<Object>) => {
+      setFavoritesData(values.map((e) => e.data));
+    });
+  }, [favorites]);
+
   return (
     <CustomDrawer anchor="left">
       <Profile {...props} />
-      <div className="drawerInner">
-        {indicators.map((indicator, i) => (
-          <Accordion
-            className="accordion"
-            disableGutters
-            square
-            key={i}
+      <Box
+        sx={{
+          padding: "4%",
+          height: "100vh",
+          overflow: "hidden",
+        }}
+      >
+        <Typography>Indicators:</Typography>
+        <Box
+          sx={{
+            height: "50%",
+            overflow: "auto",
+            // border: "5px solid yellow",
+          }}
+          className="custom-scroll"
+        >
+          {indicators.map((indicator, i) => (
+            <Accordion
+              className="accordion"
+              disableGutters
+              square
+              key={i}
+              sx={{
+                "&:before": {
+                  display: "none",
+                },
+              }}
+            >
+              <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                <Typography>{indicator.name}</Typography>
+              </AccordionSummary>
+              <AccordionDetails>
+                <Typography>{indicator.description}</Typography>
+                <Typography>{indicator.calculation}</Typography>
+              </AccordionDetails>
+            </Accordion>
+          ))}
+        </Box>
+        <br />
+        <Typography>Favorites:</Typography>
+        {favorites ? (
+          <Box
             sx={{
-              "&:before": {
-                display: "none",
-              },
+              height: "43%",
+              // border: "5px solid yellow",
+              overflow: "auto",
+            }}
+            className="custom-scroll"
+          >
+            {favoritesData.length ? (
+              <>
+                {favoritesData?.map((e, i) => (
+                  <Card
+                    key={i}
+                    sx={{
+                      marginBottom: "5%",
+                      // border: "5px solid yellow",
+                      cursor: "pointer",
+                    }}
+                    className="card-hover"
+                    onClick={(ev) =>
+                      handleFavoriteClick(ev, e["Global Quote"]["01. symbol"])
+                    }
+                  >
+                    <CardContent>
+                      {/* {console.log(favorites)}
+                    {console.log(favoritesData)}
+                    {console.log(e)}
+                    {console.log(e["Global Quote"])} */}
+                      <Typography>{e["Global Quote"]["01. symbol"]}</Typography>
+                      <Typography
+                        color={
+                          +e["Global Quote"]["09. change"] < 0 ? "red" : "green"
+                        }
+                        fontSize="15px"
+                      >
+                        {formatDollarAmount(e["Global Quote"]["05. price"])} /{" "}
+                        {e["Global Quote"]["10. change percent"]}{" "}
+                        {+e["Global Quote"]["09. change"] < 0 ? "↘" : "↗"}
+                      </Typography>
+                    </CardContent>
+                  </Card>
+                ))}
+              </>
+            ) : (
+              <Box
+                sx={{
+                  height: "40%",
+                  display: "flex",
+                }}
+              >
+                <Typography
+                  sx={{
+                    textAlign: "center",
+                    margin: "auto",
+                  }}
+                >
+                  Search and click the favorite button to see your favorite
+                  stock tickers pinned
+                </Typography>
+              </Box>
+            )}
+          </Box>
+        ) : (
+          <Box
+            sx={{
+              display: "flex",
+              margin: "3%",
+              height: "40%",
             }}
           >
-            <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-              <Typography>{indicator.name}</Typography>
-            </AccordionSummary>
-            <AccordionDetails>
-              <Typography>{indicator.description}</Typography>
-              <Typography>{indicator.calculation}</Typography>
-            </AccordionDetails>
-          </Accordion>
-        ))}
-      </div>
+            <Typography
+              sx={{
+                textAlign: "center",
+                margin: "auto",
+              }}
+            >
+              Login to save and see favorites
+            </Typography>
+          </Box>
+        )}
+      </Box>
     </CustomDrawer>
   );
 }

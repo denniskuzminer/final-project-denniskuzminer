@@ -96,7 +96,7 @@ export default function Landing(props: any) {
 
   return (
     <Box sx={{ paddingRight: rightDrawerWidth, paddingLeft: leftDrawerWidth }}>
-      <IndicatorsPicker {...props} />
+      <IndicatorsPicker {...props} setSymbol={setSymbol} />
       {/* {getPrices("IBM", "5min")} */}
       <CustomDrawer anchor="right">
         {symbol ? (

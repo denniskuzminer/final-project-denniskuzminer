@@ -62,3 +62,35 @@ export const API_LIMIT_ERROR_MESSAGE =
 export const hitAPILimit = (data) =>
   data.Note ===
   "Thank you for using Alpha Vantage! Our standard API call frequency is 5 calls per minute and 500 calls per day. Please visit https://www.alphavantage.co/premium/ if you would like to target a higher API call frequency.";
+
+export const getDataFromFavorites = async (favorites: Array<string>) => {
+  if (!favorites.length) {
+    return [];
+  }
+  return await Promise.all(
+    favorites.map((symbol) =>
+      axios.get(
+        `https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol=${symbol}&apikey=${process
+          .env.ALPHA_VANTAGE_API_KEY!}`
+      )
+    )
+  )
+    .then((values) => values)
+    .catch((error) => {
+      console.log(error);
+      return [];
+    });
+};
+
+const formatter = new Intl.NumberFormat("en-US", {
+  style: "currency",
+  currency: "USD",
+  minimumFractionDigits: 0,
+});
+
+export const formatDollarAmount = (amt) => {
+  const formattedArr = ("" + formatter.format(+amt)).split(".");
+  return (
+     formattedArr.join(".") + (formattedArr[1].length === 1 ? "0" : "")
+  );
+};

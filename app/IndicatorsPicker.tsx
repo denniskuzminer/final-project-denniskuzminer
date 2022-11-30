@@ -32,6 +32,9 @@ import {
   formatDollarAmount,
   getDataFromFavorites,
 } from "./utils/marketApiUtils";
+import { useDrag } from "react-dnd";
+import { ITEM_TYPES } from "./constants";
+import Indicator from "./Indicator";
 
 interface ProfileProps {
   user: User;
@@ -98,25 +101,9 @@ export default function IndicatorsPicker(props: IndicatorsPickerProps) {
           className="custom-scroll"
         >
           {indicators.map((indicator, i) => (
-            <Accordion
-              className="accordion"
-              disableGutters
-              square
-              key={i}
-              sx={{
-                "&:before": {
-                  display: "none",
-                },
-              }}
-            >
-              <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                <Typography>{indicator.name}</Typography>
-              </AccordionSummary>
-              <AccordionDetails>
-                <Typography>{indicator.description}</Typography>
-                <Typography>{indicator.calculation}</Typography>
-              </AccordionDetails>
-            </Accordion>
+            <div key={i}>
+              <Indicator indicator={indicator} />
+            </div>
           ))}
         </Box>
         <br />

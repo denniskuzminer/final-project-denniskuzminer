@@ -18,14 +18,17 @@ import {
   DialogContent,
   DialogContentText,
   CircularProgress,
+  LinearProgress,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
+import FilterDramaIcon from "@mui/icons-material/FilterDrama";
 import { rightDrawerWidth, leftDrawerWidth } from "./backtest/constants";
 import IndicatorsPicker from "./IndicatorsPicker";
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
 import FavoriteIcon from "@mui/icons-material/Favorite";
 import {
   data,
+  ITEM_TYPES,
   SEARCH_TIMEOUT,
   TIME_FRAMES,
   TIME_FRAMES_TO_INTERVALS,
@@ -47,6 +50,10 @@ import Highcharts from "highcharts/highstock";
 import HighchartsReact from "highcharts-react-official";
 import { easeOutBounce, stockDown, stockUp } from "./utils/graphUtils";
 import { theme } from "./theme/themes";
+import Divider from "@mui/material/Divider";
+import { useDrop } from "react-dnd";
+import Graph from "./Graph";
+import Loader from "./Loader";
 
 const toolTipElement = (props: any) => {
   return <div>{props.point.data.y} °C</div>;
@@ -92,6 +99,7 @@ export default function Landing(props: any) {
   const [interval, setInterval] = useState("5min");
   const [isLoading, setIsLoading] = useState(false);
   const [companyTimeSeries, setCompanyTimeSeries] = useState([]);
+  const [graphLoading, setGraphLoading] = useState(false);
 
   const isFavorite =
     user.favorites && user.favorites.includes(companyInfo["Symbol"]);
@@ -129,9 +137,10 @@ export default function Landing(props: any) {
       setSearchResults(await searchSymbol(criteria));
     }, SEARCH_TIMEOUT)
   ).current;
-
+  console.log(symbol);
   useEffect(() => {
     setIsLoading(true);
+    setGraphLoading(true);
     getCompanyInfo(symbol).then((data) => {
       console.log(data);
       setCompanyInfo(data);
@@ -143,6 +152,7 @@ export default function Landing(props: any) {
     getPrices(symbol, timeFrame, interval).then((data) => {
       console.log(data);
       setCompanyTimeSeries(data);
+      setGraphLoading(false);
     });
   }, [companyInfo]); //also create useEffect for timeframe and interval that gets prices from cache
 
@@ -341,7 +351,29 @@ export default function Landing(props: any) {
             textAlign: "center",
           }}
         >
-          <Typography variant="h3">Stratus</Typography>
+          <Box
+            sx={{
+              display: "inline",
+            }}
+          >
+            <Typography
+              sx={{
+                display: "inline-block",
+                verticalAlign: "middle",
+              }}
+              variant="h3"
+            >
+              Stratus
+            </Typography>
+            <FilterDramaIcon
+              fontSize="large"
+              sx={{
+                display: "inline-block",
+                verticalAlign: "middle",
+                marginLeft: "2%",
+              }}
+            />
+          </Box>
           <Typography>
             Stratus is an application that allows you to backtest some
             <br />
@@ -369,22 +401,7 @@ export default function Landing(props: any) {
           }}
         >
           {isLoading ? (
-            <Box
-              sx={{
-                display: "flex",
-                width: "100%",
-                justifyContent: "center",
-                paddingTop: "10%",
-              }}
-            >
-              <CircularProgress
-                size="large"
-                sx={{
-                  width: "20%",
-                  height: "30%",
-                }}
-              />
-            </Box>
+            <Loader />
           ) : (
             <>
               <Box
@@ -416,7 +433,11 @@ export default function Landing(props: any) {
                 }}
               >
                 <Box>
-                  <Typography color="secondary">{`${companyInfo["PERatio"]}: ${companyInfo["Symbol"]} ↗↘`}</Typography>
+                  <Typography color={stockStyles.main}>{`${formatDollarAmount(
+                    +companyTimeSeries.y?.at(-1)
+                  )} ${
+                    companyTimeSeries.direction === "up" ? "↗" : "↘"
+                  }`}</Typography>
                 </Box>
                 <Box>
                   <Tabs centered value={"Line"}>
@@ -424,94 +445,47 @@ export default function Landing(props: any) {
                     <Tab sx={{ minWidth: "0" }} value="Candle" label="Candle" />
                   </Tabs>
                 </Box>
-                <Box>
-                  <Tabs
-                    centered
-                    value={interval}
-                    onChange={handleIntervalChange}
-                  >
-                    {TIME_FRAMES_TO_INTERVALS[timeFrame].map((e, i) => (
-                      <Tab sx={{ minWidth: "0" }} key={i} value={e} label={e} />
-                    ))}
-                  </Tabs>
-                </Box>
-                <Box>
+                <Box className="align-right">
                   <Tabs
                     onChange={handleTimeFrameChange}
-                    centered
                     value={timeFrame}
+                    className="align-right"
                   >
                     {TIME_FRAMES.map((e, i) => (
                       <Tab sx={{ minWidth: "0" }} key={i} value={e} label={e} />
                     ))}
                   </Tabs>
+                  <Box className="align-right">
+                    <Tabs
+                      value={interval}
+                      onChange={handleIntervalChange}
+                      className="align-right"
+                    >
+                      {TIME_FRAMES_TO_INTERVALS[timeFrame].map((e, i) => (
+                        <Tab
+                          sx={{ minWidth: "0" }}
+                          key={i}
+                          value={e}
+                          label={e}
+                        />
+                      ))}
+                    </Tabs>
+                  </Box>
                 </Box>
               </Box>
-              {/* <Plot
-                data={[
-                  {
-                    x: companyTimeSeries.x,
-                    y: companyTimeSeries.y,
-                    type: "scatter",
-                    mode: "lines",
-                    marker: { color: "yellow" },
-                    connectgaps: true,
-                  },
-                ]}
-                layout={{ width: 720, height: 440 }}
-                options={{ displaylogo: "false" }}
-              /> */}
+              {/*               
               {console.log(
                 companyTimeSeries.y?.map((e, i) => [
                   new Date(companyTimeSeries.x[i]).getTime(),
                   +e,
                 ])
-              )}
-              <HighchartsReact
-                highcharts={Highcharts}
-                constructorType={"stockChart"}
-                options={{
-                  rangeSelector: {
-                    buttons: [],
-                    inputEnabled: false,
-                  },
-                  plotOptions: {
-                    series: {
-                      lineColor: stockStyles.main,
-                    },
-                  },
-                  series: [
-                    {
-                      name: companyInfo["Symbol"],
-                      type: "area",
-                      // xAxis: {
-                      //   gapGridLineWidth: 0,
-                      // },
-                      data: companyTimeSeries.data,
-                      gapSize: 5,
-                      tooltip: {
-                        valueDecimals: 2,
-                      },
-                      fillColor: {
-                        linearGradient: {
-                          x1: 0,
-                          y1: 0,
-                          x2: 0,
-                          y2: 1,
-                        },
-                        stops: [
-                          [0, stockStyles.main],
-                          [1, stockStyles.transparent],
-                        ],
-                      },
-                      threshold: null,
-                      animation: {
-                        duration: 3000,
-                        easing: easeOutBounce,
-                      },
-                    },
-                  ],
-                }}
+              )} */}
+              <Graph
+                stockStyles={stockStyles}
+                companyInfo={companyInfo}
+                companyTimeSeries={companyTimeSeries}
+                graphLoading={graphLoading}
+                setGraphLoading={setGraphLoading}
               />
               <Box>
                 <Typography className="info-header" variant="h5">
@@ -543,6 +517,7 @@ export default function Landing(props: any) {
                   </Box>
                 </Box>
               </Box>
+              <Divider />
               <Box>
                 <Typography className="info-header" variant="h5">
                   Price
@@ -571,6 +546,7 @@ export default function Landing(props: any) {
                   </Typography>
                 </Box>
               </Box>
+              <Divider />
               <Box>
                 <Typography className="info-header" variant="h5">
                   Fundamentals
@@ -620,3 +596,48 @@ export default function Landing(props: any) {
     </Box>
   );
 }
+
+/*
+<Box
+              sx={{
+                display: "flex",
+                width: "100%",
+                height: "100%",
+                justifyContent: "center",
+                paddingTop: "10%",
+                border: "3px solid yellow",
+              }}
+            >
+              <Box
+                style={{
+                  border: "3px solid yellow",
+                  width: "15vw",
+                  height: "15vw",
+                  justifyContent: "center",
+                }}
+              >
+                <FilterDramaIcon
+                  fontSize="large"
+                  sx={{
+                    width: "10vw",
+                    height: "10vw",
+                    // width: "15%",
+                    // height: "20%",
+                    // position: "absolute",
+                    // top: "35%",
+                    // clear: "both",
+                  }}
+                />
+                <CircularProgress
+                  size="large"
+                  thickness={1}
+                  sx={{
+                    width: "10vw",
+                    height: "10vw",
+                    border: "3px solid yellow",
+                    marginTop: "-13vw",
+                  }}
+                />
+              </Box>
+            </Box>
+*/

@@ -19,21 +19,21 @@ a {
 }
 
 .custom-scroll::-webkit-scrollbar,
-.highcharts-scrollbar-thumb::-webkit-scrollbar {
+.highcharts-scrollbar::-webkit-scrollbar {
   width: 11px !important;
 }
 .custom-scroll,
-.highcharts-scrollbar-thumb {
+.highcharts-scrollbar {
   scroll-margin: 0 0 0 10px !important;
   scrollbar-width: thin !important;
   scrollbar-color: var(--thumbBG) var(--scrollbarBG) !important;
 }
 .custom-scroll::-webkit-scrollbar-track,
-.highcharts-scrollbar-thumb::-webkit-scrollbar-track {
+.highcharts-scrollbar-track {
   background: var(--scrollbarBG) !important;
 }
 .custom-scroll::-webkit-scrollbar-thumb,
-.highcharts-scrollbar-thumb::-webkit-scrollbar-thumb {
+.highcharts-scrollbar-thumb {
   background-color: var(--thumbBG) !important;
   border-radius: 6px !important;
   border: 3px solid var(--scrollbarBG) !important;
@@ -58,12 +58,27 @@ rect.highcharts-background {
 }
 
 .info-header {
-  margin: 1% 0 0.5% 0;
+  margin: 2% 0 0.5% 0;
 }
 .info-text-container {
   display: flex;
   width: 100%;
+  margin-bottom: 2%;
 }
 .info-text-inner {
   width: 50%;
+}
+.align-right {
+  display: block;
+  margin-left: auto;
+  margin-right: 0;
+  align-items: flex-end;
+  align-content: flex-end;
+  align-self: flex-end;
+  justify-items: right;
+  justify-content: right;
+  justify-self: right;
+  text-align: right;
+  right: 0;
+  /* border: 2px solid yellow; */
 }

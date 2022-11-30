@@ -15,6 +15,8 @@ import Backtest from "./backtest/page";
 import Landing from "./page";
 import { Josefin_Sans } from "@next/font/google";
 import "./globals.css";
+import { DndProvider } from "react-dnd";
+import { HTML5Backend } from "react-dnd-html5-backend";
 import CustomDrawer from "./CustomDrawer";
 import Head from "next/head";
 
@@ -43,7 +45,7 @@ export default function RootLayout({
   return (
     <html>
       <head>
-        {/* <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link
           rel="preconnect"
           href="https://fonts.gstatic.com"
@@ -53,7 +55,7 @@ export default function RootLayout({
         <link
           href="https://fonts.googleapis.com/css2?family=Josefin+Sans:wght@500&display=swap"
           rel="stylesheet"
-        /> */}
+        />
         {/* <style jsx global>{`
           html {
             font-family: ${josefin_sans.style.fontFamily};
@@ -65,21 +67,22 @@ export default function RootLayout({
         </style> */}
         <meta name="emotion-insertion-point" content="" />
       </head>
-
       <ThemeProvider theme={theme}>
         <CssBaseline />
-        <body>
-          <main className="root">
-            <header>
-              <Tabs centered value={page} onChange={handlePageChange}>
-                <Tab value="Search" label="Search" />
-                <Tab value="Backtest" label="Backtest" />
-              </Tabs>
-            </header>
-            {page === "Search" ? <Landing {...props} /> : <Backtest />}
-            <footer></footer>
-          </main>
-        </body>
+        <DndProvider backend={HTML5Backend}>
+          <body>
+            <main className="root">
+              <header>
+                <Tabs centered value={page} onChange={handlePageChange}>
+                  <Tab value="Search" label="Search" />
+                  <Tab value="Backtest" label="Backtest" />
+                </Tabs>
+              </header>
+              {page === "Search" ? <Landing {...props} /> : <Backtest />}
+              <footer></footer>
+            </main>
+          </body>
+        </DndProvider>
       </ThemeProvider>
     </html>
   );

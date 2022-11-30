@@ -24,6 +24,10 @@ export const TIME_FRAMES_TO_INTERVALS = {
   "5Y": ["1W", "1M", "1Y"],
 };
 
+export const ITEM_TYPES = {
+  INDICATOR: "indicator",
+};
+
 export const data = [
   {
     id: "japan",

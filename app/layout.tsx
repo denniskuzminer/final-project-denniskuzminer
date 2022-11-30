@@ -43,7 +43,7 @@ export default function RootLayout({
   return (
     <html>
       <head>
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        {/* <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link
           rel="preconnect"
           href="https://fonts.gstatic.com"
@@ -53,7 +53,7 @@ export default function RootLayout({
         <link
           href="https://fonts.googleapis.com/css2?family=Josefin+Sans:wght@500&display=swap"
           rel="stylesheet"
-        />
+        /> */}
         {/* <style jsx global>{`
           html {
             font-family: ${josefin_sans.style.fontFamily};

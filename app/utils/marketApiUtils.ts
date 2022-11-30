@@ -2,16 +2,65 @@ import axios from "axios";
 
 export const getPrices = async (
   symbol: string,
-  interval: any,
-  func = "TIME_SERIES_INTRADAY"
+  timeFrame: any,
+  interval: any = null
 ) => {
-  const { data } = await axios.get(
-    `https://www.alphavantage.co/query?function=${func}&symbol=${symbol}&interval=${interval}&apikey=${process
-      .env.ALPHA_VANTAGE_API_KEY!}`
-  );
-  const timeSeries = data[`Time Series (${interval})`];
+  // const timeToFunction =
+  //   {
+  //     "1H": "TIME_SERIES_INTRADAY",
+  //     "4H": "TIME_SERIES_INTRADAY",
+  //     "1D": "TIME_SERIES_INTRADAY",
+  //     "1W": "TIME_SERIES_INTRADAY",
+  //     "1M": "TIME_SERIES_INTRADAY",
+  //     "3M": "TIME_SERIES_DAILY_ADJUSTED",
+  //     YTD: "TIME_SERIES_DAILY_ADJUSTED",
+  //     "1Y": "TIME_SERIES_DAILY_ADJUSTED",
+  //     "5Y": "TIME_SERIES_WEEKLY_ADJUSTED",
+  //   }[timeFrame] || "";
 
-  console.log(data);
+  if (!timeFrame || !symbol) {
+    return [];
+  }
+
+  if (["1H", "4H", "1D", "1W", "1M"].includes(timeFrame)) {
+    const { data } = await axios.get(
+      `https://www.alphavantage.co/query?function=TIME_SERIES_INTRADAY&symbol=${symbol}&interval=${interval}&outputsize=${
+        ["1H", "4H", "1D"].includes(timeFrame) ? "compact" : "full"
+      }&apikey=${process.env.ALPHA_VANTAGE_API_KEY!}`
+    );
+    let timeSeries = data[`Time Series (${interval})`];
+    let x = Object.keys(timeSeries);
+    let y = Object.entries(timeSeries).map((e) => e[1]["4. close"]);
+    // x.forEach((e, i, a) => {
+    //   if (i - 1 > 0 && e.split(" ")[0] !== a[i - 1].split(" ")[0]) {
+    //     // timeSeries.splice(i - 1, 0, null);
+    //     x.splice(i - 1, 0, null);
+    //     y.splice(i - 1, 0, null);
+    //   }
+    // });
+    return {
+      data: y?.map((e, i) => [new Date(x[i]).getTime(), +e]),
+      x,
+      y,
+      direction:
+        +Object.entries(timeSeries)[0][1]["1. open"] - +y[y.length - 1] >= 0
+          ? "up"
+          : "down",
+    };
+  }
+  //("1H", "4H", "1D", "1W", "1M", "3M", "YTD", "1Y", "5Y")
+  // 1h and 4h can also do 1 minute
+  // 1 month can do these agg
+  // 5min, 15min, 30min, 60min
+  // 3M to 1Y that do daily minimum
+  // 5Y do weekly minimum
+
+  // const { data } = await axios.get(
+  //   `https://www.alphavantage.co/query?function=${func}&symbol=${symbol}&interval=${interval}&apikey=${process
+  //     .env.ALPHA_VANTAGE_API_KEY!}`
+  // );
+
+  // console.log(data);
 };
 
 export const searchSymbol = async (keywords: string) => {
@@ -64,7 +113,7 @@ export const hitAPILimit = (data) =>
   "Thank you for using Alpha Vantage! Our standard API call frequency is 5 calls per minute and 500 calls per day. Please visit https://www.alphavantage.co/premium/ if you would like to target a higher API call frequency.";
 
 export const getDataFromFavorites = async (favorites: Array<string>) => {
-  if (!favorites.length) {
+  if (!favorites?.length) {
     return [];
   }
   return await Promise.all(
@@ -90,7 +139,5 @@ const formatter = new Intl.NumberFormat("en-US", {
 
 export const formatDollarAmount = (amt) => {
   const formattedArr = ("" + formatter.format(+amt)).split(".");
-  return (
-     formattedArr.join(".") + (formattedArr[1].length === 1 ? "0" : "")
-  );
+  return formattedArr.join(".") + (formattedArr[1]?.length === 1 ? "0" : "");
 };

@@ -19,7 +19,7 @@ import {
 } from "@mui/material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
-import { indicators } from "./backtest/constants";
+import { defaultIndicators } from "./backtest/constants";
 import CloseIcon from "@mui/icons-material/Close";
 import "./globals.css";
 import "./IndicatorsPicker.Module.css";
@@ -66,7 +66,7 @@ type LoginFormDataLike = LoginFormData | SignUpFormData;
 type IndicatorsPickerProps = ProfileProps;
 
 export default function IndicatorsPicker(props: IndicatorsPickerProps) {
-  const { user, setSymbol } = props;
+  const { user, setSymbol,indicators, setIndicators } = props;
   const { favorites } = user;
   const [favoritesData, setFavoritesData] = useState([]);
 
@@ -102,7 +102,7 @@ export default function IndicatorsPicker(props: IndicatorsPickerProps) {
         >
           {indicators.map((indicator, i) => (
             <div key={i}>
-              <Indicator indicator={indicator} />
+              <Indicator indicator={indicator} setIndicators={setIndicators} />
             </div>
           ))}
         </Box>
@@ -124,7 +124,6 @@ export default function IndicatorsPicker(props: IndicatorsPickerProps) {
                     key={i}
                     sx={{
                       marginBottom: "5%",
-                      // border: "5px solid yellow",
                       cursor: "pointer",
                     }}
                     className="card-hover"
@@ -133,10 +132,6 @@ export default function IndicatorsPicker(props: IndicatorsPickerProps) {
                     }
                   >
                     <CardContent>
-                      {/* {console.log(favorites)}
-                    {console.log(favoritesData)}
-                    {console.log(e)}
-                    {console.log(e["Global Quote"])} */}
                       <Typography>{e["Global Quote"]["01. symbol"]}</Typography>
                       <Typography
                         color={

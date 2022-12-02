@@ -52,7 +52,7 @@ export default function RootLayout({
           crossOrigin="true"
         />
 
-        <link
+        <link 
           href="https://fonts.googleapis.com/css2?family=Josefin+Sans:wght@500&display=swap"
           rel="stylesheet"
         />

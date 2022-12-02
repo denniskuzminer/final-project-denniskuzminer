@@ -38,22 +38,5 @@ export default async function handler(
       .save()
       .then((data: Array<any>) => res.status(200).json(data))
       .catch((err: any) => res.status(err.status).send("Error saving user"));
-
-    // auth.register(
-    //   req.body.username,
-    //   req.body.password,
-    //   function (err) {
-    //     return;
-    //   },
-    //   function (newUser) {
-    //     auth.startAuthenticatedSession(req, newUser, (err) => {
-    //       if (!err) {
-    //         res.status(200).json(newUser);
-    //       } else {
-    //         res.render("error", { message: "err authing???" });
-    //       }
-    //     });
-    //   }
-    // );
   }
 }

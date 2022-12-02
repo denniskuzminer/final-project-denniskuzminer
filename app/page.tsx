@@ -22,7 +22,11 @@ import {
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import FilterDramaIcon from "@mui/icons-material/FilterDrama";
-import { rightDrawerWidth, leftDrawerWidth } from "./backtest/constants";
+import {
+  rightDrawerWidth,
+  leftDrawerWidth,
+  defaultIndicators,
+} from "./backtest/constants";
 import IndicatorsPicker from "./IndicatorsPicker";
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
 import FavoriteIcon from "@mui/icons-material/Favorite";
@@ -36,7 +40,7 @@ import {
 import {
   API_LIMIT_ERROR_MESSAGE,
   formatDollarAmount,
-  getCompanyInfo,
+  getCompanyInfoAndNews,
   getPrices,
   hitAPILimit,
   searchSymbol,
@@ -54,6 +58,7 @@ import Divider from "@mui/material/Divider";
 import { useDrop } from "react-dnd";
 import Graph from "./Graph";
 import Loader from "./Loader";
+import axios from "axios";
 
 const toolTipElement = (props: any) => {
   return <div>{props.point.data.y} °C</div>;
@@ -94,17 +99,34 @@ export default function Landing(props: any) {
   const [symbol, setSymbol] = useState("");
   const [searchResults, setSearchResults] = useState([]);
   const [companyInfo, setCompanyInfo] = useState({});
+  const [companyNews, setCompanyNews] = useState({});
   const [askForSignInOpen, setAskForSignInOpen] = useState(false);
   const [timeFrame, setTimeFrame] = useState("1D");
   const [interval, setInterval] = useState("5min");
   const [isLoading, setIsLoading] = useState(false);
   const [companyTimeSeries, setCompanyTimeSeries] = useState([]);
   const [graphLoading, setGraphLoading] = useState(false);
+  const [favoritesLoading, setFavoritesLoading] = useState(false);
+  const [graphType, setGraphType] = useState("Line");
+  const [indicators, setIndicators] = useState(defaultIndicators);
+  const [needToPollAgain, setNeedToPollAgain] = useState({
+    companyTimeSeries: false,
+    companyInfo: false,
+    companyNews: false,
+  });
 
   const isFavorite =
-    user.favorites && user.favorites.includes(companyInfo["Symbol"]);
+    user.favorites && user.favorites.includes(companyInfo?.Symbol);
   const stockStyles =
     companyTimeSeries.direction === "up" ? stockUp : stockDown;
+  const percentChange = Number(
+    (
+      ((+companyTimeSeries.y?.at(0) -
+        +companyTimeSeries.y?.at(companyTimeSeries.y?.length - 1)) /
+        +companyTimeSeries.y?.at(companyTimeSeries.y?.length - 1)) *
+      100
+    ).toFixed(2)
+  );
 
   const handleSearchChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     debouncedSearch(e.target.value);
@@ -116,8 +138,32 @@ export default function Landing(props: any) {
     }
   };
 
-  const handleAskSignIn = (_) => {
+  const handleAskSignIn = () => {
     setAskForSignInOpen((prev) => !prev);
+  };
+
+  const handleAddFavorite = async () => {
+    if (Object.keys(user).length === 0) {
+      handleAskSignIn();
+      return;
+    }
+    setFavoritesLoading(true);
+    const newFavorites = !isFavorite
+      ? [...user.favorites, companyInfo["Symbol"]]
+      : user.favorites.filter((e) => e !== companyInfo["Symbol"]);
+    axios
+      .put("/api/user/addFavorite", {
+        username: user.username,
+        favorites: newFavorites,
+      })
+      .then(({ data }) => {
+        const { username, hash, favorites, strategies, backtests } = data;
+        setUser({ username, hash, favorites, strategies, backtests });
+        setFavoritesLoading(false);
+      })
+      .catch((err) => {
+        setFavoritesLoading(false);
+      });
   };
 
   const handleTimeFrameChange = (e) => {
@@ -126,6 +172,10 @@ export default function Landing(props: any) {
     if (!TIME_FRAMES_TO_INTERVALS[newVal].includes(interval)) {
       setInterval(TIME_FRAMES_TO_INTERVALS[newVal][0]);
     }
+  };
+
+  const handleGraphTypeChange = (event: SyntheticEvent, newValue: string) => {
+    setGraphType(newValue);
   };
 
   const handleIntervalChange = (e) => {
@@ -137,22 +187,39 @@ export default function Landing(props: any) {
       setSearchResults(await searchSymbol(criteria));
     }, SEARCH_TIMEOUT)
   ).current;
-  console.log(symbol);
+
   useEffect(() => {
     setIsLoading(true);
     setGraphLoading(true);
-    getCompanyInfo(symbol).then((data) => {
-      console.log(data);
-      setCompanyInfo(data);
-      setIsLoading(false);
+    getCompanyInfoAndNews(symbol).then((data) => {
+      const { info, news } = data;
+      if (!hitAPILimit(info)) {
+        setCompanyInfo(info || {});
+        setNeedToPollAgain((prev) => ({ ...prev, companyInfo: false }));
+        setIsLoading(false);
+      } else {
+        setNeedToPollAgain((prev) => ({ ...prev, companyInfo: true }));
+      }
+      if (!hitAPILimit(news)) {
+        setCompanyNews(news || {});
+        setNeedToPollAgain((prev) => ({ ...prev, companyNews: false }));
+        setIsLoading(false);
+      } else {
+        setNeedToPollAgain((prev) => ({ ...prev, companyNews: true }));
+      }
     });
   }, [symbol]);
 
   useEffect(() => {
     getPrices(symbol, timeFrame, interval).then((data) => {
-      console.log(data);
-      setCompanyTimeSeries(data);
-      setGraphLoading(false);
+      console.log("Get prices was called", data);
+      if (!hitAPILimit(data)) {
+        setCompanyTimeSeries(data || {});
+        setGraphLoading(false);
+        setNeedToPollAgain((prev) => ({ ...prev, companyTimeSeries: false }));
+      } else {
+        setNeedToPollAgain((prev) => ({ ...prev, companyTimeSeries: true }));
+      }
     });
   }, [companyInfo]); //also create useEffect for timeframe and interval that gets prices from cache
 
@@ -164,8 +231,12 @@ export default function Landing(props: any) {
 
   return (
     <Box sx={{ paddingRight: rightDrawerWidth, paddingLeft: leftDrawerWidth }}>
-      <IndicatorsPicker {...props} setSymbol={setSymbol} />
-      {/* {getPrices("IBM", "5min")} */}
+      <IndicatorsPicker
+        {...props}
+        indicators={indicators}
+        setIndicators={setIndicators}
+        setSymbol={setSymbol}
+      />
       <CustomDrawer anchor="right">
         {symbol ? (
           <Box
@@ -173,7 +244,6 @@ export default function Landing(props: any) {
               height: "100%",
               padding: "10%",
               overflow: "hidden",
-              // border: "4px solid yellow",
             }}
           >
             <Typography fontWeight="700" variant="h6">
@@ -183,7 +253,6 @@ export default function Landing(props: any) {
               sx={{
                 height: "47%",
                 overflow: "auto",
-                // border: "4px solid yellow",
               }}
               className="custom-scroll"
             >
@@ -209,7 +278,7 @@ export default function Landing(props: any) {
                 <ErrorMessage />
               ) : (
                 <Box>
-                  {companyInfo["News"]?.feed?.map(
+                  {companyNews?.feed?.map(
                     (
                       {
                         title,
@@ -287,7 +356,7 @@ export default function Landing(props: any) {
           options={searchResults}
           clearOnBlur={false}
           autoComplete={true}
-          noOptionsText="Search equities and ETFs in the U.S."
+          noOptionsText="Search equities in the U.S."
           onChange={handleSearchSelect}
           sx={{
             alignItems: "center",
@@ -377,7 +446,7 @@ export default function Landing(props: any) {
           <Typography>
             Stratus is an application that allows you to backtest some
             <br />
-            strategies that you may have in mind on equities or ETFs with a few
+            strategies that you may have in mind on equities with a few
             technical indicators.
             <br />
             Search for your favorite stock or make an account to get started!
@@ -416,12 +485,22 @@ export default function Landing(props: any) {
                 </Box>
                 <Box>
                   <Button
-                    onClick={handleAskSignIn}
+                    onClick={handleAddFavorite}
                     startIcon={
-                      isFavorite ? <FavoriteIcon /> : <FavoriteBorderIcon />
+                      favoritesLoading ? (
+                        <></>
+                      ) : isFavorite ? (
+                        <FavoriteIcon />
+                      ) : (
+                        <FavoriteBorderIcon />
+                      )
                     }
                   >
-                    Favorite
+                    {favoritesLoading ? (
+                      <LinearProgress sx={{ width: "100%" }} />
+                    ) : (
+                      <>Favorite</>
+                    )}
                   </Button>
                 </Box>
               </Box>
@@ -434,13 +513,18 @@ export default function Landing(props: any) {
               >
                 <Box>
                   <Typography color={stockStyles.main}>{`${formatDollarAmount(
-                    +companyTimeSeries.y?.at(-1)
-                  )} ${
+                    +companyTimeSeries.y?.at(0)
+                  )}`}</Typography>
+                  <Typography color={stockStyles.main}>{`${percentChange}% ${
                     companyTimeSeries.direction === "up" ? "↗" : "↘"
                   }`}</Typography>
                 </Box>
                 <Box>
-                  <Tabs centered value={"Line"}>
+                  <Tabs
+                    centered
+                    value={graphType}
+                    onChange={handleGraphTypeChange}
+                  >
                     <Tab sx={{ minWidth: "0" }} value="Line" label="Line" />
                     <Tab sx={{ minWidth: "0" }} value="Candle" label="Candle" />
                   </Tabs>
@@ -473,19 +557,15 @@ export default function Landing(props: any) {
                   </Box>
                 </Box>
               </Box>
-              {/*               
-              {console.log(
-                companyTimeSeries.y?.map((e, i) => [
-                  new Date(companyTimeSeries.x[i]).getTime(),
-                  +e,
-                ])
-              )} */}
               <Graph
                 stockStyles={stockStyles}
                 companyInfo={companyInfo}
                 companyTimeSeries={companyTimeSeries}
                 graphLoading={graphLoading}
                 setGraphLoading={setGraphLoading}
+                graphType={graphType}
+                indicators={indicators}
+                setIndicators={setIndicators}
               />
               <Box>
                 <Typography className="info-header" variant="h5">
@@ -596,48 +676,3 @@ export default function Landing(props: any) {
     </Box>
   );
 }
-
-/*
-<Box
-              sx={{
-                display: "flex",
-                width: "100%",
-                height: "100%",
-                justifyContent: "center",
-                paddingTop: "10%",
-                border: "3px solid yellow",
-              }}
-            >
-              <Box
-                style={{
-                  border: "3px solid yellow",
-                  width: "15vw",
-                  height: "15vw",
-                  justifyContent: "center",
-                }}
-              >
-                <FilterDramaIcon
-                  fontSize="large"
-                  sx={{
-                    width: "10vw",
-                    height: "10vw",
-                    // width: "15%",
-                    // height: "20%",
-                    // position: "absolute",
-                    // top: "35%",
-                    // clear: "both",
-                  }}
-                />
-                <CircularProgress
-                  size="large"
-                  thickness={1}
-                  sx={{
-                    width: "10vw",
-                    height: "10vw",
-                    border: "3px solid yellow",
-                    marginTop: "-13vw",
-                  }}
-                />
-              </Box>
-            </Box>
-*/

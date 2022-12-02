@@ -36,7 +36,7 @@ import {
 import {
   API_LIMIT_ERROR_MESSAGE,
   formatDollarAmount,
-  getCompanyInfo,
+  getCompanyInfoAndNews,
   getPrices,
   hitAPILimit,
   searchSymbol,
@@ -61,17 +61,36 @@ const Graph = (props) => {
     companyTimeSeries,
     graphLoading,
     setGraphLoading,
+    graphType,
+    indicators,
+    setIndicators,
   } = props;
   const [{ isOver }, drop] = useDrop(
     () => ({
       accept: ITEM_TYPES.INDICATOR,
-      drop: () => console.log("hello"),
+      drop: (item) => {
+        console.log("item", item);
+        setIndicators((prev) =>
+          prev.map((e) => (e.id === item.id ? { ...e, active: true } : e))
+        );
+      },
       collect: (monitor) => ({
         isOver: !!monitor.isOver(),
       }),
     }),
     []
   );
+
+  const shownIndicatorsSeries = indicators
+    .filter((e) => e.active)
+    .map((e) => ({
+      type: "line",
+      id: e.id,
+      name: e.id,
+      data: e.calculation(companyTimeSeries.data, e.params),
+    }));
+
+  console.log("shownIndicatorsSeries", shownIndicatorsSeries);
 
   return (
     <div
@@ -80,6 +99,7 @@ const Graph = (props) => {
         opacity: isOver ? 0.5 : 1,
       }}
     >
+      {console.log(graphType)}
       {graphLoading ? (
         <div style={{ position: "absolute", zIndex: 20000000, width: "65%" }}>
           <Loader />
@@ -120,8 +140,12 @@ const Graph = (props) => {
             series: [
               {
                 name: companyInfo["Symbol"],
-                type: "area",
-                data: companyTimeSeries.data,
+                id: companyInfo["Symbol"],
+                type: graphType === "Line" ? "area" : "ohlc",
+                data:
+                  graphType === "Line"
+                    ? companyTimeSeries.data
+                    : companyTimeSeries.ohlc,
                 gapSize: 5,
                 fillColor: {
                   linearGradient: {
@@ -141,6 +165,13 @@ const Graph = (props) => {
                   easing: easeOutBounce,
                 },
               },
+              ...shownIndicatorsSeries,
+              // {
+              //   type: "column",
+              //   id: "volume",
+              //   name: "Volume",
+              //   data: companyTimeSeries.volume,
+              // },
             ],
           }}
         />

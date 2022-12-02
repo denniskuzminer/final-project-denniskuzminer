@@ -14,11 +14,33 @@ export const formFields = [
 export const rightDrawerWidth = "15%";
 export const leftDrawerWidth = "15%";
 
-export const indicators = [
+export function getSMA(timeSeries, params) {
+  const { Periods: window } = params;
+  if (!timeSeries || timeSeries.length < window) {
+    return [];
+  }
+  let index = window - 1;
+  const length = timeSeries.length + 1;
+  const simpleMovingAverages = [];
+  timeSeries = timeSeries.reverse();
+  console.log(timeSeries);
+  while (++index < length) {
+    const windowSlice = timeSeries.slice(index - window, index);
+    const sum = windowSlice.reduce((prev, curr) => prev + curr[1], 0);
+    simpleMovingAverages.push([timeSeries[index]?.at(0), sum / window]);
+  }
+  console.log(simpleMovingAverages);
+  return simpleMovingAverages;
+}
+
+export const defaultIndicators = [
   {
     name: "Simple Moving Average",
     description: "Plots the average of the previous X periods",
-    calculation: "",
+    params: { Periods: 21 },
+    calculation: getSMA,
+    id: "SMA",
+    active: false,
   },
   {
     name: "Exponential Moving Average",

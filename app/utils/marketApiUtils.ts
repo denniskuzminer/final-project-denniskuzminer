@@ -40,6 +40,18 @@ export const getPrices = async (
     // });
     return {
       data: y?.map((e, i) => [new Date(x[i]).getTime(), +e]),
+      ohlc: Object.entries(timeSeries).map(([k, e], i) => [
+        new Date(k).getTime(),
+        +e["1. open"],
+        +e["2. high"],
+        +e["3. low"],
+        +e["4. close"],
+        // +e["5. volume"],
+      ]),
+      volume: Object.entries(timeSeries).map(([k, e], i) => [
+        new Date(k).getTime(),
+        +e["5. volume"],
+      ]),
       x,
       y,
       direction:
@@ -81,7 +93,7 @@ export const searchSymbol = async (keywords: string) => {
   );
 };
 
-export const getCompanyInfo = async (symbol: string) => {
+export const getCompanyInfoAndNews = async (symbol: string) => {
   if (!symbol) {
     return {};
   }
@@ -96,20 +108,19 @@ export const getCompanyInfo = async (symbol: string) => {
   )
     .then((values) => {
       const [{ data: info }, { data: news }] = values;
-      info["News"] = news;
-      return info;
+      return { info, news };
     })
     .catch((error) => ({}));
 };
 
 export const API_LIMIT_ERROR_MESSAGE =
-  "Woah, woah, woah. Listen, I appreciate that you find my project cool and want to try things out, " +
+  " Woah, woah, woah. Listen, I appreciate that you find my project cool and want to try things out, " +
   "but I'm just a measly student. We're not all made of money. APIs are expensive kinda... I'm working " +
   'with the free tier here. I know what you\'re thinking, \n\t "Cool story developer man, so what?"\n' +
   "Well, I only get 5 API calls per minute, so wait one minute and check right back here again. :)";
 
 export const hitAPILimit = (data) =>
-  data.Note ===
+  data?.Note ===
   "Thank you for using Alpha Vantage! Our standard API call frequency is 5 calls per minute and 500 calls per day. Please visit https://www.alphavantage.co/premium/ if you would like to target a higher API call frequency.";
 
 export const getDataFromFavorites = async (favorites: Array<string>) => {

@@ -25,7 +25,7 @@ import {
   rightDrawerWidth,
   leftDrawerWidth,
   formFields,
-  indicators,
+  defaultIndicators,
 } from "./constants";
 import { BacktestFormData } from "./models";
 
@@ -165,7 +165,7 @@ export default function Backtest() {
             </CustomDrawer>
             <CustomDrawer anchor="left">
               <div className="drawerInner">
-                {indicators.map((indicator, i) => (
+                {defaultIndicators.map((indicator, i) => (
                   <Accordion
                     className="accordion"
                     disableGutters

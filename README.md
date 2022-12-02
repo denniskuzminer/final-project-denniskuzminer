@@ -110,6 +110,26 @@ Wasn't really sure how many points you want us to allocate for ourselves. 8 or 1
 - Added a lot more Typescript types for new components
 - I have had lots of deployment issues. I tried deploying on netlify instead of vercel. Here is the link: https://deluxe-jelly-5699ff.netlify.app/
 
+### Milestone 4 Update
+
+Alright let's talk about this...
+So, I figured this would happen.... buuuut I think I bit off a bit more than I could chew doing this big of an undertaking for the given project requirements.
+I spent a lot of time making this app look nice and have some level of engaging functionality, but it seems like I may not have time to do the actual backtesting module.... or implement too many indicators. Right now, I just want to meet the project specifications. So let's talk about that now:
+
+- (12 points) minimum 3 x forms or ajax interactions (excluding login). I have sign up, login, and add favorites endpoints for users, a submit strategy endpoint, and call the alpha vantage api in several locations: getting news, getting company info, getting favorites info, and getting company price history
+- (4 points) minimum 2 x any of the following (can be the same). I am using lots of map, some filter, and a few reduce
+- (2 points) minimum 2 x mongoose schemas. Yes, users and strategies.
+- (8 points) stability / security. Well. I hope I've done all of this. Remember only 5 API calls per minute
+- (4 points) originality. I hope so.
+- (10 points) worth of research topics; see below
+  - (3 points) Configuration management
+  - (3 points) Perform client side form validation using custom JavaScript or JavaScript library (I do a little bit of this)
+  - (2 points) Use a CSS framework or UI toolkit. Material UI
+  - (6 points) Use a front-end framework. React + Next
+  - (1 - 6 points) Per external API used. AlphaVantage. I used it a lot actually.
+
+Anyways, the app meets the requirements. I'd like to finish it and develop it a bit more, but I probably won't have enough time to finish.
+
 #### Notes
 
 - Look back at https://github.com/mui/material-ui/issues/34910 for Turbopack MUI compatibility

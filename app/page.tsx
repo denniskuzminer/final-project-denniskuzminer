@@ -17,7 +17,6 @@ import {
   DialogTitle,
   DialogContent,
   DialogContentText,
-  CircularProgress,
   LinearProgress,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
@@ -31,8 +30,6 @@ import IndicatorsPicker from "./IndicatorsPicker";
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
 import FavoriteIcon from "@mui/icons-material/Favorite";
 import {
-  data,
-  ITEM_TYPES,
   SEARCH_TIMEOUT,
   TIME_FRAMES,
   TIME_FRAMES_TO_INTERVALS,
@@ -43,26 +40,19 @@ import {
   getCompanyInfoAndNews,
   getPrices,
   hitAPILimit,
+  Prices,
   searchSymbol,
 } from "./utils/marketApiUtils";
 import SearchIcon from "@mui/icons-material/Search";
-import { useEffect, useRef, useState } from "react";
+import { SyntheticEvent, useEffect, useRef, useState } from "react";
 import { debounce } from "lodash";
 import { convertAPIStringToDateString } from "./utils/dateUtils";
-import Plot from "react-plotly.js";
-import Highcharts from "highcharts/highstock";
-import HighchartsReact from "highcharts-react-official";
-import { easeOutBounce, stockDown, stockUp } from "./utils/graphUtils";
-import { theme } from "./theme/themes";
+import { stockDown, stockUp } from "./utils/graphUtils";
 import Divider from "@mui/material/Divider";
-import { useDrop } from "react-dnd";
 import Graph from "./Graph";
 import Loader from "./Loader";
 import axios from "axios";
-
-const toolTipElement = (props: any) => {
-  return <div>{props.point.data.y} °C</div>;
-};
+import { IndicatorModel } from "./backtest/models";
 
 const ErrorMessage = () => {
   const message = API_LIMIT_ERROR_MESSAGE.split(". ");
@@ -76,7 +66,7 @@ const ErrorMessage = () => {
   );
 };
 
-const SignInMessage = ({ handleAskSignIn, askForSignInOpen }) => {
+const SignInMessage = ({ handleAskSignIn, askForSignInOpen }: any) => {
   return (
     <Dialog open={askForSignInOpen} onClose={handleAskSignIn}>
       <DialogTitle sx={{ display: "flex", justifyContent: "space-between" }}>
@@ -96,20 +86,23 @@ const SignInMessage = ({ handleAskSignIn, askForSignInOpen }) => {
 
 export default function Landing(props: any) {
   const { user, setUser } = props;
-  const [symbol, setSymbol] = useState("");
-  const [searchResults, setSearchResults] = useState([]);
-  const [companyInfo, setCompanyInfo] = useState({});
-  const [companyNews, setCompanyNews] = useState({});
-  const [askForSignInOpen, setAskForSignInOpen] = useState(false);
-  const [timeFrame, setTimeFrame] = useState("1D");
-  const [interval, setInterval] = useState("5min");
-  const [isLoading, setIsLoading] = useState(false);
-  const [companyTimeSeries, setCompanyTimeSeries] = useState([]);
-  const [graphLoading, setGraphLoading] = useState(false);
-  const [favoritesLoading, setFavoritesLoading] = useState(false);
-  const [graphType, setGraphType] = useState("Line");
-  const [indicators, setIndicators] = useState(defaultIndicators);
-  const [needToPollAgain, setNeedToPollAgain] = useState({
+  const [symbol, setSymbol] = useState<string>("");
+  const [searchResults, setSearchResults] = useState<any>([]);
+  const [companyInfo, setCompanyInfo] = useState<any>({});
+  const [companyNews, setCompanyNews] = useState<any>({});
+  const [askForSignInOpen, setAskForSignInOpen] = useState<boolean>(false);
+  const [timeFrame, setTimeFrame] = useState<string>("1D");
+  const [interval, setInterval] = useState<string>("5min");
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [companyTimeSeries, setCompanyTimeSeries] = useState<Prices>(
+    {} as Prices
+  );
+  const [graphLoading, setGraphLoading] = useState<boolean>(false);
+  const [favoritesLoading, setFavoritesLoading] = useState<boolean>(false);
+  const [graphType, setGraphType] = useState<string>("Line");
+  const [indicators, setIndicators] =
+    useState<Array<IndicatorModel>>(defaultIndicators);
+  const [needToPollAgain, setNeedToPollAgain] = useState<any>({
     companyTimeSeries: false,
     companyInfo: false,
     companyNews: false,
@@ -119,20 +112,15 @@ export default function Landing(props: any) {
     user.favorites && user.favorites.includes(companyInfo?.Symbol);
   const stockStyles =
     companyTimeSeries.direction === "up" ? stockUp : stockDown;
+  const finalPrice = +(companyTimeSeries.y?.at(0) ?? 1);
+  const initialPrice = +(
+    companyTimeSeries.y?.at(companyTimeSeries.y?.length - 1) ?? 1
+  );
   const percentChange = Number(
-    (
-      ((+companyTimeSeries.y?.at(0) -
-        +companyTimeSeries.y?.at(companyTimeSeries.y?.length - 1)) /
-        +companyTimeSeries.y?.at(companyTimeSeries.y?.length - 1)) *
-      100
-    ).toFixed(2)
+    (((finalPrice - initialPrice) / initialPrice) * 100).toFixed(2)
   );
 
-  const handleSearchChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    debouncedSearch(e.target.value);
-  };
-
-  const handleSearchSelect = (e) => {
+  const handleSearchSelect = (e: any) => {
     if (e.target.textContent) {
       setSymbol(e.target.textContent);
     }
@@ -150,7 +138,7 @@ export default function Landing(props: any) {
     setFavoritesLoading(true);
     const newFavorites = !isFavorite
       ? [...user.favorites, companyInfo["Symbol"]]
-      : user.favorites.filter((e) => e !== companyInfo["Symbol"]);
+      : user.favorites.filter((e: string) => e !== companyInfo["Symbol"]);
     axios
       .put("/api/user/addFavorite", {
         username: user.username,
@@ -166,20 +154,20 @@ export default function Landing(props: any) {
       });
   };
 
-  const handleTimeFrameChange = (e) => {
-    const newVal = e.target.textContent;
+  const handleTimeFrameChange = (e: any) => {
+    const newVal = e.target.textContent ?? "";
     setTimeFrame(newVal);
     if (!TIME_FRAMES_TO_INTERVALS[newVal].includes(interval)) {
       setInterval(TIME_FRAMES_TO_INTERVALS[newVal][0]);
     }
   };
 
-  const handleGraphTypeChange = (event: SyntheticEvent, newValue: string) => {
+  const handleGraphTypeChange = (_: any, newValue: string) => {
     setGraphType(newValue);
   };
 
-  const handleIntervalChange = (e) => {
-    setInterval(e.target.textContent);
+  const handleIntervalChange = (e: any) => {
+    setInterval(e.target.textContent ?? "");
   };
 
   const debouncedSearch = useRef(
@@ -188,37 +176,47 @@ export default function Landing(props: any) {
     }, SEARCH_TIMEOUT)
   ).current;
 
+  const handleSearchChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    debouncedSearch(e.target.value);
+  };
+
   useEffect(() => {
     setIsLoading(true);
     setGraphLoading(true);
-    getCompanyInfoAndNews(symbol).then((data) => {
+    getCompanyInfoAndNews(symbol).then((data: any) => {
       const { info, news } = data;
       if (!hitAPILimit(info)) {
         setCompanyInfo(info || {});
-        setNeedToPollAgain((prev) => ({ ...prev, companyInfo: false }));
+        setNeedToPollAgain((prev: any) => ({ ...prev, companyInfo: false }));
         setIsLoading(false);
       } else {
-        setNeedToPollAgain((prev) => ({ ...prev, companyInfo: true }));
+        setNeedToPollAgain((prev: any) => ({ ...prev, companyInfo: true }));
       }
       if (!hitAPILimit(news)) {
         setCompanyNews(news || {});
-        setNeedToPollAgain((prev) => ({ ...prev, companyNews: false }));
+        setNeedToPollAgain((prev: any) => ({ ...prev, companyNews: false }));
         setIsLoading(false);
       } else {
-        setNeedToPollAgain((prev) => ({ ...prev, companyNews: true }));
+        setNeedToPollAgain((prev: any) => ({ ...prev, companyNews: true }));
       }
     });
   }, [symbol]);
 
   useEffect(() => {
-    getPrices(symbol, timeFrame, interval).then((data) => {
+    getPrices(symbol, timeFrame, interval).then((data: any) => {
       console.log("Get prices was called", data);
       if (!hitAPILimit(data)) {
         setCompanyTimeSeries(data || {});
         setGraphLoading(false);
-        setNeedToPollAgain((prev) => ({ ...prev, companyTimeSeries: false }));
+        setNeedToPollAgain((prev: any) => ({
+          ...prev,
+          companyTimeSeries: false,
+        }));
       } else {
-        setNeedToPollAgain((prev) => ({ ...prev, companyTimeSeries: true }));
+        setNeedToPollAgain((prev: any) => ({
+          ...prev,
+          companyTimeSeries: true,
+        }));
       }
     });
   }, [companyInfo]); //also create useEffect for timeframe and interval that gets prices from cache
@@ -286,8 +284,8 @@ export default function Landing(props: any) {
                         banner_image,
                         time_published,
                         source_domain,
-                      },
-                      i
+                      }: any,
+                      i: number
                     ) => (
                       <Card
                         sx={{
@@ -363,7 +361,7 @@ export default function Landing(props: any) {
             justifyContent: "center",
             width: "40%",
           }}
-          getOptionLabel={(option) =>
+          getOptionLabel={(option: any) =>
             `${option["1. symbol"]} - ${option["2. name"]}`
           }
           renderInput={(params) => (
@@ -513,7 +511,7 @@ export default function Landing(props: any) {
               >
                 <Box>
                   <Typography color={stockStyles.main}>{`${formatDollarAmount(
-                    +companyTimeSeries.y?.at(0)
+                    finalPrice
                   )}`}</Typography>
                   <Typography color={stockStyles.main}>{`${percentChange}% ${
                     companyTimeSeries.direction === "up" ? "↗" : "↘"
@@ -562,7 +560,6 @@ export default function Landing(props: any) {
                 companyInfo={companyInfo}
                 companyTimeSeries={companyTimeSeries}
                 graphLoading={graphLoading}
-                setGraphLoading={setGraphLoading}
                 graphType={graphType}
                 indicators={indicators}
                 setIndicators={setIndicators}

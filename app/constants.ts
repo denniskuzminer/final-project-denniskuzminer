@@ -12,7 +12,7 @@ export const TIME_FRAMES = [
   "5Y",
 ];
 
-export const TIME_FRAMES_TO_INTERVALS = {
+export const TIME_FRAMES_TO_INTERVALS: Record<string, string[]> = {
   "1H": ["1min", "5min", "15min", "30min", "60min"],
   "4H": ["1min", "5min", "15min", "30min", "60min"],
   "1D": ["5min", "15min", "30min", "60min", "1D"],

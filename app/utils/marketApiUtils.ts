@@ -1,4 +1,14 @@
 import axios from "axios";
+import { AnyAaaaRecord } from "dns";
+
+export interface Prices {
+  data: Array<Array<number | undefined>>;
+  ohlc: Array<Array<number | undefined>>;
+  volume: Array<Array<number | undefined>>;
+  x: Array<string>;
+  y: Array<number | undefined>;
+  direction: string;
+}
 
 export const getPrices = async (
   symbol: string,
@@ -30,17 +40,10 @@ export const getPrices = async (
     );
     let timeSeries = data[`Time Series (${interval})`];
     let x = Object.keys(timeSeries);
-    let y = Object.entries(timeSeries).map((e) => e[1]["4. close"]);
-    // x.forEach((e, i, a) => {
-    //   if (i - 1 > 0 && e.split(" ")[0] !== a[i - 1].split(" ")[0]) {
-    //     // timeSeries.splice(i - 1, 0, null);
-    //     x.splice(i - 1, 0, null);
-    //     y.splice(i - 1, 0, null);
-    //   }
-    // });
+    let y = Object.entries(timeSeries).map((e: any) => +e[1]["4. close"]); // it gets a little complicated with the types here
     return {
       data: y?.map((e, i) => [new Date(x[i]).getTime(), +e]),
-      ohlc: Object.entries(timeSeries).map(([k, e], i) => [
+      ohlc: Object.entries(timeSeries).map(([k, e]: any) => [
         new Date(k).getTime(),
         +e["1. open"],
         +e["2. high"],
@@ -48,14 +51,16 @@ export const getPrices = async (
         +e["4. close"],
         // +e["5. volume"],
       ]),
-      volume: Object.entries(timeSeries).map(([k, e], i) => [
+      volume: Object.entries(timeSeries).map(([k, e]: any) => [
         new Date(k).getTime(),
         +e["5. volume"],
       ]),
       x,
       y,
       direction:
-        +Object.entries(timeSeries)[0][1]["1. open"] - +y[y.length - 1] >= 0
+        +(Object.entries(timeSeries)[0][1] as any)["1. open"] -
+          +y[y.length - 1] >=
+        0
           ? "up"
           : "down",
     };
@@ -71,8 +76,6 @@ export const getPrices = async (
   //   `https://www.alphavantage.co/query?function=${func}&symbol=${symbol}&interval=${interval}&apikey=${process
   //     .env.ALPHA_VANTAGE_API_KEY!}`
   // );
-
-  // console.log(data);
 };
 
 export const searchSymbol = async (keywords: string) => {
@@ -119,7 +122,7 @@ export const API_LIMIT_ERROR_MESSAGE =
   'with the free tier here. I know what you\'re thinking, \n\t "Cool story developer man, so what?"\n' +
   "Well, I only get 5 API calls per minute, so wait one minute and check right back here again. :)";
 
-export const hitAPILimit = (data) =>
+export const hitAPILimit = (data: any) =>
   data?.Note ===
   "Thank you for using Alpha Vantage! Our standard API call frequency is 5 calls per minute and 500 calls per day. Please visit https://www.alphavantage.co/premium/ if you would like to target a higher API call frequency.";
 
@@ -148,7 +151,7 @@ const formatter = new Intl.NumberFormat("en-US", {
   minimumFractionDigits: 0,
 });
 
-export const formatDollarAmount = (amt) => {
+export const formatDollarAmount = (amt: string | number): string => {
   const formattedArr = ("" + formatter.format(+amt)).split(".");
   return formattedArr.join(".") + (formattedArr[1]?.length === 1 ? "0" : "");
 };

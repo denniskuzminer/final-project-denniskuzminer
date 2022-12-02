@@ -15,9 +15,10 @@ import { useDrag } from "react-dnd";
 import { ITEM_TYPES } from "./constants";
 import { Fragment } from "react";
 import { Box } from "@mui/system";
+import { IndicatorProps } from "./models";
 
-const Indicator = (props) => {
-  const { indicator, setIndicators } = props;
+const Indicator = (props: IndicatorProps) => {
+  const { indicator } = props;
   const [{ isDragging }, drag] = useDrag(() => ({
     type: ITEM_TYPES.INDICATOR,
     id: indicator.name,
@@ -27,13 +28,13 @@ const Indicator = (props) => {
     }),
   }));
 
-  const handleIndicatorParamChange = (name, val) => {
-    setIndicators((prev) =>
-      prev.map((e) =>
-        e.id === indicator.id ? { ...indicator, [name]: val } : e
-      )
-    );
-  };
+  // const handleIndicatorParamChange = (name, val) => {
+  //   setIndicators((prev) =>
+  //     prev.map((e) =>
+  //       e.id === indicator.id ? { ...indicator, [name]: val } : e
+  //     )
+  //   );
+  // };
 
   return (
     <div ref={drag}>

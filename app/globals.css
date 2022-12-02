@@ -68,6 +68,7 @@ rect.highcharts-background {
 .info-text-inner {
   width: 50%;
 }
+/* I think I'm gonna keep this here. It's kinda funny. Instead of taking 5 minutes to investigate what is going on, I think I just threw the kitchen sink at it. */
 .align-right {
   display: block;
   margin-left: auto;
@@ -80,5 +81,4 @@ rect.highcharts-background {
   justify-self: right;
   text-align: right;
   right: 0;
-  /* border: 2px solid yellow; */
 }

@@ -1,4 +1,6 @@
-export const easeOutBounce = function (pos) {
+import { StockStyles } from "../models";
+
+export const easeOutBounce = function (pos: number) {
   if (pos < 1 / 2.75) {
     return 7.5625 * pos * pos;
   }
@@ -11,12 +13,12 @@ export const easeOutBounce = function (pos) {
   return 7.5625 * (pos -= 2.625 / 2.75) * pos + 0.984375;
 };
 
-export const stockUp = {
+export const stockUp: StockStyles = {
   main: "rgba(134,210,159,1)",
   transparent: "rgba(134,210,159,0)",
 };
 
-export const stockDown = {
+export const stockDown: StockStyles = {
   main: "rgba(200,37,37,1)",
   transparent: "rgba(200,37,37,0)",
 };

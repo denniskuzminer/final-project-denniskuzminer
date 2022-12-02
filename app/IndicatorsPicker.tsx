@@ -1,25 +1,19 @@
 "use client";
 
 import {
-  Accordion,
-  AccordionSummary,
   Typography,
-  AccordionDetails,
   Avatar,
   Button,
   Stack,
   Card,
   CardContent,
   Popover,
-  ClickAwayListener,
   TextField,
   Alert,
   CircularProgress,
   IconButton,
 } from "@mui/material";
-import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
-import { defaultIndicators } from "./backtest/constants";
 import CloseIcon from "@mui/icons-material/Close";
 import "./globals.css";
 import "./IndicatorsPicker.Module.css";
@@ -32,14 +26,13 @@ import {
   formatDollarAmount,
   getDataFromFavorites,
 } from "./utils/marketApiUtils";
-import { useDrag } from "react-dnd";
-import { ITEM_TYPES } from "./constants";
 import Indicator from "./Indicator";
+import { IndicatorModel } from "./backtest/models";
 
 interface ProfileProps {
   user: User;
   setUser: React.Dispatch<React.SetStateAction<User>>;
-  setSymbol: React.Dispatch<React.SetStateAction<User>>;
+  setSymbol: React.Dispatch<React.SetStateAction<string>>;
 }
 
 interface User {
@@ -63,21 +56,25 @@ interface SignUpFormData {
 
 type LoginFormDataLike = LoginFormData | SignUpFormData;
 
-type IndicatorsPickerProps = ProfileProps;
+// type IndicatorsPickerProps = ProfileProps;
+
+interface IndicatorsPickerProps extends ProfileProps {
+  indicators: IndicatorModel[];
+  setIndicators: React.Dispatch<React.SetStateAction<IndicatorModel[]>>;
+}
 
 export default function IndicatorsPicker(props: IndicatorsPickerProps) {
-  const { user, setSymbol,indicators, setIndicators } = props;
+  const { user, setSymbol, indicators, setIndicators } = props;
   const { favorites } = user;
   const [favoritesData, setFavoritesData] = useState([]);
 
-  const handleFavoriteClick = (e, symbol) => {
+  const handleFavoriteClick = (_: any, symbol: string) => {
     setSymbol(symbol);
-    // console.log(e);
   };
 
   useEffect(() => {
     getDataFromFavorites(favorites).then((values: Array<Object>) => {
-      setFavoritesData(values.map((e) => e.data));
+      setFavoritesData(values.map((e: any) => e.data) as any);
     });
   }, [favorites]);
 
@@ -96,7 +93,6 @@ export default function IndicatorsPicker(props: IndicatorsPickerProps) {
           sx={{
             height: "50%",
             overflow: "auto",
-            // border: "5px solid yellow",
           }}
           className="custom-scroll"
         >
@@ -189,17 +185,9 @@ export default function IndicatorsPicker(props: IndicatorsPickerProps) {
   );
 }
 
-const user = {
-  username: "denniskuzminer",
-  hash: "String",
-  favorites: ["TSLA", "AMZN", "AAPL", "GOOGL"],
-  strategies: ["mongoose.Schema.Types.ObjectId"],
-  backtests: ["mongoose.Schema.Types.ObjectId"],
-};
-
 function Profile(props: ProfileProps) {
   const { user, setUser } = props;
-  const { username, hash, favorites, strategies, backtests } = user;
+  const { username } = user;
   const [formLoading, setFormLoading] = useState(false);
   const [formOpen, setFormOpen] = useState("");
   const [formData, setFormData] = useState<LoginFormDataLike>(

@@ -182,7 +182,6 @@ export default function Backtest() {
                     </AccordionSummary>
                     <AccordionDetails>
                       <Typography>{indicator.description}</Typography>
-                      <Typography>{indicator.calculation}</Typography>
                     </AccordionDetails>
                   </Accordion>
                 ))}

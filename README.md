@@ -130,6 +130,18 @@ I spent a lot of time making this app look nice and have some level of engaging 
 
 Anyways, the app meets the requirements. I'd like to finish it and develop it a bit more, but I probably won't have enough time to finish.
 
+Here are a list of all of the technologies I used that we did not learn in class:
+- Next.js 13
+- Material UI
+- Highcharts
+- React Dnd
+- Typescript
+- Axios
+- AlphaVantage API
+- .env
+- Formik (but it's not really used to it's fullest extent)
+
+
 #### Notes
 
 - Look back at https://github.com/mui/material-ui/issues/34910 for Turbopack MUI compatibility

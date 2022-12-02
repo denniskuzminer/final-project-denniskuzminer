@@ -13,3 +13,12 @@ export interface BacktestFormData {
   options?: string;
   backtests: any;
 }
+
+export interface IndicatorModel {
+  name: string;
+  description: string;
+  params?: Object;
+  calculation: Function;
+  id: string;
+  active: boolean;
+}

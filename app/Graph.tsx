@@ -1,66 +1,21 @@
 "use client";
 
-import CustomDrawer from "./CustomDrawer";
-import {
-  Typography,
-  Box,
-  IconButton,
-  TextField,
-  Autocomplete,
-  Button,
-  Tabs,
-  Tab,
-  Card,
-  CardMedia,
-  CardContent,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogContentText,
-  CircularProgress,
-  LinearProgress,
-} from "@mui/material";
-import CloseIcon from "@mui/icons-material/Close";
-import FilterDramaIcon from "@mui/icons-material/FilterDrama";
-import { rightDrawerWidth, leftDrawerWidth } from "./backtest/constants";
-import IndicatorsPicker from "./IndicatorsPicker";
-import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
-import FavoriteIcon from "@mui/icons-material/Favorite";
-import {
-  data,
-  ITEM_TYPES,
-  SEARCH_TIMEOUT,
-  TIME_FRAMES,
-  TIME_FRAMES_TO_INTERVALS,
-} from "./constants";
-import {
-  API_LIMIT_ERROR_MESSAGE,
-  formatDollarAmount,
-  getCompanyInfoAndNews,
-  getPrices,
-  hitAPILimit,
-  searchSymbol,
-} from "./utils/marketApiUtils";
-import SearchIcon from "@mui/icons-material/Search";
-import { useEffect, useRef, useState } from "react";
-import { debounce } from "lodash";
-import { convertAPIStringToDateString } from "./utils/dateUtils";
-import Plot from "react-plotly.js";
+import { ITEM_TYPES } from "./constants";
 import Highcharts from "highcharts/highstock";
 import HighchartsReact from "highcharts-react-official";
-import { easeOutBounce, stockDown, stockUp } from "./utils/graphUtils";
+import { easeOutBounce } from "./utils/graphUtils";
 import { theme } from "./theme/themes";
-import Divider from "@mui/material/Divider";
 import { useDrop } from "react-dnd";
 import Loader from "./Loader";
+import { IndicatorModel } from "./backtest/models";
+import { GraphProps } from "./models";
 
-const Graph = (props) => {
+const Graph = (props: GraphProps) => {
   const {
     stockStyles,
     companyInfo,
     companyTimeSeries,
     graphLoading,
-    setGraphLoading,
     graphType,
     indicators,
     setIndicators,
@@ -68,9 +23,8 @@ const Graph = (props) => {
   const [{ isOver }, drop] = useDrop(
     () => ({
       accept: ITEM_TYPES.INDICATOR,
-      drop: (item) => {
-        console.log("item", item);
-        setIndicators((prev) =>
+      drop: (item: IndicatorModel) => {
+        setIndicators((prev: IndicatorModel[]) =>
           prev.map((e) => (e.id === item.id ? { ...e, active: true } : e))
         );
       },
@@ -82,8 +36,8 @@ const Graph = (props) => {
   );
 
   const shownIndicatorsSeries = indicators
-    .filter((e) => e.active)
-    .map((e) => ({
+    .filter((e: IndicatorModel) => e.active)
+    .map((e: IndicatorModel) => ({
       type: "line",
       id: e.id,
       name: e.id,
@@ -99,7 +53,6 @@ const Graph = (props) => {
         opacity: isOver ? 0.5 : 1,
       }}
     >
-      {console.log(graphType)}
       {graphLoading ? (
         <div style={{ position: "absolute", zIndex: 20000000, width: "65%" }}>
           <Loader />

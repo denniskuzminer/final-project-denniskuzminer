@@ -1,3 +1,5 @@
+import { IndicatorModel } from "./models";
+
 export const formFields = [
   { id: "name", label: "Name", text: "Name" },
   { id: "principal", label: "Amount", text: "Principal" },
@@ -14,7 +16,10 @@ export const formFields = [
 export const rightDrawerWidth = "15%";
 export const leftDrawerWidth = "15%";
 
-export function getSMA(timeSeries, params) {
+export function getSMA(
+  timeSeries: Array<Array<number | undefined>>,
+  params: { Periods: number }
+): Array<Array<number | undefined>> {
   const { Periods: window } = params;
   if (!timeSeries || timeSeries.length < window) {
     return [];
@@ -26,14 +31,14 @@ export function getSMA(timeSeries, params) {
   console.log(timeSeries);
   while (++index < length) {
     const windowSlice = timeSeries.slice(index - window, index);
-    const sum = windowSlice.reduce((prev, curr) => prev + curr[1], 0);
+    const sum = windowSlice.reduce((prev, curr) => prev + (curr[1] ?? 0), 0);
     simpleMovingAverages.push([timeSeries[index]?.at(0), sum / window]);
   }
   console.log(simpleMovingAverages);
   return simpleMovingAverages;
 }
 
-export const defaultIndicators = [
+export const defaultIndicators: IndicatorModel[] = [
   {
     name: "Simple Moving Average",
     description: "Plots the average of the previous X periods",
@@ -42,69 +47,69 @@ export const defaultIndicators = [
     id: "SMA",
     active: false,
   },
-  {
-    name: "Exponential Moving Average",
-    description: "Plots the average of the previous X periods",
-    calculation: "",
-  },
-  {
-    name: "Simple Moving Average",
-    description: "Plots the average of the previous X periods",
-    calculation: "",
-  },
-  {
-    name: "Exponential Moving Average",
-    description: "Plots the average of the previous X periods",
-    calculation: "",
-  },
-  {
-    name: "Simple Moving Average",
-    description: "Plots the average of the previous X periods",
-    calculation: "",
-  },
-  {
-    name: "Exponential Moving Average",
-    description: "Plots the average of the previous X periods",
-    calculation: "",
-  },
-  {
-    name: "Simple Moving Average",
-    description: "Plots the average of the previous X periods",
-    calculation: "",
-  },
-  {
-    name: "Exponential Moving Average",
-    description: "Plots the average of the previous X periods",
-    calculation: "",
-  },
-  {
-    name: "Simple Moving Average",
-    description: "Plots the average of the previous X periods",
-    calculation: "",
-  },
-  {
-    name: "Exponential Moving Average",
-    description: "Plots the average of the previous X periods",
-    calculation: "",
-  },
-  {
-    name: "Simple Moving Average",
-    description: "Plots the average of the previous X periods",
-    calculation: "",
-  },
-  {
-    name: "Exponential Moving Average",
-    description: "Plots the average of the previous X periods",
-    calculation: "",
-  },
-  {
-    name: "Simple Moving Average",
-    description: "Plots the average of the previous X periods",
-    calculation: "",
-  },
-  {
-    name: "Last Exponential Moving Average",
-    description: "Plots the average of the previous X periods",
-    calculation: "",
-  },
+  // {
+  //   name: "Exponential Moving Average",
+  //   description: "Plots the average of the previous X periods",
+  //   calculation: "",
+  // },
+  // {
+  //   name: "Simple Moving Average",
+  //   description: "Plots the average of the previous X periods",
+  //   calculation: "",
+  // },
+  // {
+  //   name: "Exponential Moving Average",
+  //   description: "Plots the average of the previous X periods",
+  //   calculation: "",
+  // },
+  // {
+  //   name: "Simple Moving Average",
+  //   description: "Plots the average of the previous X periods",
+  //   calculation: "",
+  // },
+  // {
+  //   name: "Exponential Moving Average",
+  //   description: "Plots the average of the previous X periods",
+  //   calculation: "",
+  // },
+  // {
+  //   name: "Simple Moving Average",
+  //   description: "Plots the average of the previous X periods",
+  //   calculation: "",
+  // },
+  // {
+  //   name: "Exponential Moving Average",
+  //   description: "Plots the average of the previous X periods",
+  //   calculation: "",
+  // },
+  // {
+  //   name: "Simple Moving Average",
+  //   description: "Plots the average of the previous X periods",
+  //   calculation: "",
+  // },
+  // {
+  //   name: "Exponential Moving Average",
+  //   description: "Plots the average of the previous X periods",
+  //   calculation: "",
+  // },
+  // {
+  //   name: "Simple Moving Average",
+  //   description: "Plots the average of the previous X periods",
+  //   calculation: "",
+  // },
+  // {
+  //   name: "Exponential Moving Average",
+  //   description: "Plots the average of the previous X periods",
+  //   calculation: "",
+  // },
+  // {
+  //   name: "Simple Moving Average",
+  //   description: "Plots the average of the previous X periods",
+  //   calculation: "",
+  // },
+  // {
+  //   name: "Last Exponential Moving Average",
+  //   description: "Plots the average of the previous X periods",
+  //   calculation: "",
+  // },
 ];

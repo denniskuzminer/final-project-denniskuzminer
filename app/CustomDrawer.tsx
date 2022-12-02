@@ -24,14 +24,9 @@ export default function CustomDrawer(props: DrawerProps) {
         position: "relative",
       }}
       variant="permanent"
-      // ModalProps={{
-      //   keepMounted: true,
-      // }}
       anchor={anchor}
     >
-      {/* <div className="drawerInner"> */}
       {children}
-      {/* </div> */}
     </Drawer>
   );
 }
